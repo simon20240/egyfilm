@@ -306,14 +306,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const fetchFromLocalServers = async () => {
         try {
-            const response = await fetch(`servers.json?v=${new Date().getTime()}`);
+            const response = await fetch(`content.json?v=${new Date().getTime()}`);
             if (!response.ok) {
-                console.error('Failed to load servers.json. Make sure the file exists and the bot has run.');
+                console.error('Failed to load content.json. Make sure the file exists.');
                 return { movies: [], series: [], anime: [] };
             }
             return await response.json();
         } catch (error) {
-            console.error('Error fetching or parsing servers.json:', error);
+            console.error('Error fetching or parsing content.json:', error);
             return { movies: [], series: [], anime: [] };
         }
     };
