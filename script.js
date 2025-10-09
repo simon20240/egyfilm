@@ -304,6 +304,8 @@ document.addEventListener('DOMContentLoaded', function () {
         grid.innerHTML = items.length > 0 ? items.map(createMovieCard).join('') : `<p class="col-span-full text-center text-white">لا توجد نتائج.</p>`;
     };
 
+    // --- JIKAN API & ANIME FUNCTIONS ---
+
     const fetchFromJikan = async (endpoint, params = {}) => {
         const urlParams = new URLSearchParams(params);
         const url = `https://api.jikan.moe/v4/${endpoint}?${urlParams}`;
@@ -350,12 +352,12 @@ document.addEventListener('DOMContentLoaded', function () {
         `;
     };
 
-    const renderAnimePage = async (title, endpoint) => {
+    const renderAnimePage = async (title, endpoint, params = {}) => {
         document.getElementById('list-page-title').textContent = title;
         const grid = document.getElementById('list-page-grid');
         grid.innerHTML = '<p class="col-span-full text-center text-white">جاري تحميل الأنمي...</p>';
 
-        const jikanData = await fetchFromJikan(endpoint, { type: 'tv' });
+        const jikanData = await fetchFromJikan(endpoint, params);
         const items = jikanData?.data || [];
 
         if (items.length > 0) {
@@ -363,6 +365,55 @@ document.addEventListener('DOMContentLoaded', function () {
         } else {
             grid.innerHTML = `<p class="col-span-full text-center text-white">لا توجد نتائج. ربما حدث خطأ أثناء تحميل البيانات من Jikan API.</p>`;
         }
+    };
+
+    const renderAnimeDetailsPage = async (animeId) => {
+        const item = await fetchFromJikan(`anime/${animeId}`);
+        if (!item || !item.data) {
+            pages.details.innerHTML = `<div class="text-center py-20 text-white">تفاصيل الأنمي غير متوفرة.</div>`;
+            return;
+        }
+
+        const anime = item.data;
+        const title = anime.title;
+        const year = anime.year || '';
+        const backdropPath = anime.images?.jpg?.large_image_url || 'https://placehold.co/1920x1080/1a202c/ffffff?text=No+Image';
+        const posterPath = anime.images?.jpg?.large_image_url || 'https://placehold.co/500x750/1a202c/ffffff?text=No+Image';
+        const trailer = anime.trailer?.youtube_id;
+        const synopsis = anime.synopsis || 'لا يوجد ملخص متوفر.';
+        const score = anime.score ? anime.score.toFixed(1) : 'N/A';
+        const episodes = anime.episodes || '?';
+
+        pages.details.innerHTML = `
+            <div class="relative h-[40vh] md:h-[60vh] -mt-16">
+                <img src="${backdropPath}" class="w-full h-full object-cover">
+                <div class="absolute inset-0 bg-gradient-to-t from-gray-900 to-transparent"></div>
+            </div>
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8 -mt-24 relative z-10 pb-12">
+                <div class="flex flex-col md:flex-row gap-8">
+                    <div class="flex-shrink-0 w-48 md:w-64 mx-auto md:mx-0">
+                        <img src="${posterPath}" alt="${title}" class="rounded-lg shadow-lg">
+                    </div>
+                    <div class="flex-grow text-center md:text-right text-white">
+                        <h1 class="text-4xl font-extrabold">${title} (${year})</h1>
+                        <div class="flex items-center justify-center md:justify-start gap-4 mt-2 text-gray-300">
+                            <span class="font-semibold">${anime.type} - ${episodes} حلقات</span>
+                            <span class="flex items-center gap-1">
+                                <svg class="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+                                ${score}
+                            </span>
+                        </div>
+                        <p class="mt-4 text-gray-400 max-w-3xl mx-auto md:mx-0">${synopsis}</p>
+                        <div class="mt-6 flex flex-wrap gap-4 justify-center md:justify-start">
+                            ${trailer ? `<a href="https://www.youtube.com/watch?v=${trailer}" target="_blank" class="bg-gray-700 hover:bg-gray-600 text-white font-bold py-3 px-6 rounded-lg transition-colors flex items-center gap-2">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                مشاهدة الإعلان
+                            </a>` : ''}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
     };
 
     // --- NAVIGATION & PAGE MANAGEMENT ---
@@ -409,7 +460,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 break;
             case 'anime':
             case 'list-anime':
-                renderAnimePage('أنمي', 'top/anime');
+                renderAnimePage('أنمي', 'top/anime', { type: 'ona' });
                 break;
             case 'list-movies-country':
                 renderListPage(`أفلام ${data.countryName}`, () => fetchFromTMDb('discover/movie', { with_origin_country: data.country, sort_by: 'popularity.desc' }));
@@ -485,103 +536,6 @@ document.addEventListener('DOMContentLoaded', function () {
         const animeCard = e.target.closest('[data-anime-id]');
         if (animeCard) {
             navigateTo('details-anime', { animeId: animeCard.dataset.animeId });
-            return;
-        }
-
-        const card = e.target.closest('.group[data-id], .view-details-btn[data-id]');
-        if (card) {
-            navigateTo('details', { id: card.dataset.id, mediaType: card.dataset.mediaType });
-            return;
-        }
-
-        const navLink = e.target.closest('.nav-link[data-page]');
-        if (navLink) {
-            e.preventDefault();
-            const page = navLink.dataset.page;
-            const country = navLink.dataset.country;
-            const countryName = navLink.dataset.countryName;
-            const genreName = navLink.dataset.genreName;
-
-            const pageToGo = {
-                'home': 'home',
-                'movies': 'list-movies',
-                'series': 'list-series',
-            }[page] || page;
-
-            navigateTo(pageToGo, { nav_id: page, country, countryName, genreName });
-            document.getElementById('mobile-menu').classList.add('hidden');
-            return;
-        }
-        
-        const categoryCard = e.target.closest('.category-card[data-genre-id]');
-        if (categoryCard) {
-            navigateTo('list-genre', { genreId: categoryCard.dataset.genreId, genreName: categoryCard.dataset.genreName });
-            return;
-        }
-
-        const watchOnlineBtn = e.target.closest('#watch-online-btn');
-        if (watchOnlineBtn) {
-            document.getElementById('watch-section').style.display = 'block';
-            document.getElementById('server-tabs').style.display = 'flex';
-            document.getElementById('video-player').src = watchOnlineBtn.dataset.url;
-            window.scrollTo({ top: document.getElementById('watch-section').offsetTop - 80, behavior: 'smooth' });
-        }
-
-        const serverTab = e.target.closest('.server-tab-btn');
-        if (serverTab) {
-            document.querySelectorAll('.server-tab-btn').forEach(btn => btn.classList.remove('active', 'text-white', 'border-red-500'));
-            serverTab.classList.add('active', 'text-white', 'border-red-500');
-            document.getElementById('video-player').src = serverTab.dataset.url;
-        }
-    });
-    
-    document.getElementById('mobile-menu-button').addEventListener('click', () => {
-        document.getElementById('mobile-menu').classList.toggle('hidden');
-    });
-    
-    document.getElementById('search-input').addEventListener('keypress', (e) => {
-        if (e.key === 'Enter' && e.target.value.trim() !== '') {
-            navigateTo('list-search', { query: e.target.value.trim() });
-            e.target.blur();
-        }
-    });
-
-    // --- INITIAL LOAD ---
-    const initialize = async () => {
-        await fetchAndStoreGenres();
-        navigateTo('home');
-    };
-
-    initialize();
-});-gray-500');
-            });
-            slides[index].classList.add('active');
-            dots[index].classList.add('bg-red-600');
-            dots[index].classList.remove('bg-gray-500');
-            currentSlide = index;
-        };
-
-        const nextSlide = () => {
-            showSlide((currentSlide + 1) % slides.length);
-        };
-
-        if (sliderInterval) clearInterval(sliderInterval);
-        sliderInterval = setInterval(nextSlide, 5000);
-
-        document.getElementById('slider-dots').addEventListener('click', (e) => {
-            if(e.target.matches('.slider-dot')){
-                clearInterval(sliderInterval);
-                showSlide(parseInt(e.target.dataset.index));
-                sliderInterval = setInterval(nextSlide, 5000);
-            }
-        });
-    }
-    
-    document.body.addEventListener('click', (e) => {
-        const localCard = e.target.closest('[data-local-item]');
-        if (localCard) {
-            const itemData = JSON.parse(decodeURIComponent(localCard.dataset.localItem));
-            navigateTo('details-local', { item: itemData, nav_id: 'anime' });
             return;
         }
 
