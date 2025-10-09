@@ -304,27 +304,30 @@ document.addEventListener('DOMContentLoaded', function () {
         grid.innerHTML = items.length > 0 ? items.map(createMovieCard).join('') : `<p class="col-span-full text-center text-white">لا توجد نتائج.</p>`;
     };
 
-    const fetchFromLocalServers = async () => {
+    const fetchFromJikan = async (endpoint, params = {}) => {
+        const urlParams = new URLSearchParams(params);
+        const url = `https://api.jikan.moe/v4/${endpoint}?${urlParams}`;
         try {
-            const response = await fetch(`content.json?v=${new Date().getTime()}`);
+            const response = await fetch(url);
             if (!response.ok) {
-                console.error('Failed to load content.json. Make sure the file exists.');
-                return { movies: [], series: [], anime: [] };
+                console.error(`Jikan API Error: ${response.status} ${response.statusText}`);
+                return null;
             }
             return await response.json();
         } catch (error) {
-            console.error('Error fetching or parsing content.json:', error);
-            return { movies: [], series: [], anime: [] };
+            console.error('Failed to fetch from Jikan API:', error);
+            return null;
         }
     };
 
-    const createLocalItemCard = (item, category) => {
+    const createAnimeCard = (item) => {
         const title = item.title;
-        const posterPath = item.image || 'https://placehold.co/500x750/1a202c/ffffff?text=No+Image';
-        const itemData = encodeURIComponent(JSON.stringify(item));
+        const posterPath = item.images?.jpg?.large_image_url || 'https://placehold.co/500x750/1a202c/ffffff?text=No+Image';
+        const score = item.score ? item.score.toFixed(1) : 'N/A';
+        const type = item.type || 'Anime';
 
         return `
-            <div class="group relative rounded-lg overflow-hidden shadow-lg bg-gray-800 transform hover:-translate-y-2 transition-transform duration-300 cursor-pointer" data-local-item='${itemData}' data-category='${category}'>
+            <div class="group relative rounded-lg overflow-hidden shadow-lg bg-gray-800 transform hover:-translate-y-2 transition-transform duration-300 cursor-pointer" data-anime-id="${item.mal_id}">
                 <img src="${posterPath}" alt="${title}" class="w-full h-full object-cover" loading="lazy">
                 <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
@@ -334,49 +337,32 @@ document.addEventListener('DOMContentLoaded', function () {
                 </div>
                 <div class="absolute bottom-0 left-0 right-0 p-3 card-overlay text-right">
                     <h3 class="text-white font-bold truncate">${title}</h3>
+                    <div class="flex justify-between items-center text-xs text-gray-300 mt-1">
+                        <span>${type}</span>
+                        <div class="flex items-center space-x-1 space-x-reverse">
+                             <svg class="w-3 h-3 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+                            <span>${score}</span>
+                        </div>
+                    </div>
                 </div>
                 <div class="absolute top-2 right-2 bg-blue-600 text-white text-xs font-bold px-2 py-1 rounded">أنمي</div>
             </div>
         `;
     };
 
-    const renderSimpleDetailsPage = (item) => {
-        const title = item.title;
-        const posterPath = item.image || 'https://placehold.co/500x750/1a202c/ffffff?text=No+Image';
-        const embedUrl = item.embed_url;
-
-        if (!embedUrl) {
-            pages.details.innerHTML = `<div class="text-center py-20 text-white">رابط المشاهدة غير متوفر.</div>`;
-            return;
-        }
-
-        pages.details.innerHTML = `
-            <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-8 text-white">
-                <h1 class="text-3xl md:text-4xl font-extrabold mb-6">${title}</h1>
-                <div class="flex flex-col md:flex-row gap-8">
-                    <div class="flex-shrink-0 w-48 md:w-64 mx-auto md:mx-0">
-                        <img src="${posterPath}" alt="${title}" class="rounded-lg shadow-lg">
-                    </div>
-                    <div class="flex-grow">
-                        <h2 class="text-2xl font-bold mb-4">شاهد الآن</h2>
-                        <div class="aspect-w-16 aspect-h-9 bg-gray-900 rounded-lg overflow-hidden">
-                            <iframe src="${embedUrl}" frameborder="0" allowfullscreen class="w-full h-full"></iframe>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        `;
-    };
-
-    const renderLocalCategory = async (category, title) => {
+    const renderAnimePage = async (title, endpoint) => {
         document.getElementById('list-page-title').textContent = title;
         const grid = document.getElementById('list-page-grid');
-        grid.innerHTML = '<p class="col-span-full text-center text-white">جاري التحميل...</p>';
+        grid.innerHTML = '<p class="col-span-full text-center text-white">جاري تحميل الأنمي...</p>';
 
-        const localData = await fetchFromLocalServers();
-        const items = localData[category] || [];
+        const jikanData = await fetchFromJikan(endpoint, { type: 'tv' });
+        const items = jikanData?.data || [];
 
-        grid.innerHTML = items.length > 0 ? items.map(item => createLocalItemCard(item, category)).join('') : `<p class="col-span-full text-center text-white">لا توجد نتائج. تأكد من تشغيل البوت لإضافة محتوى.</p>`;
+        if (items.length > 0) {
+            grid.innerHTML = items.map(createAnimeCard).join('');
+        } else {
+            grid.innerHTML = `<p class="col-span-full text-center text-white">لا توجد نتائج. ربما حدث خطأ أثناء تحميل البيانات من Jikan API.</p>`;
+        }
     };
 
     // --- NAVIGATION & PAGE MANAGEMENT ---
@@ -412,8 +398,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 state.currentMediaType = data.mediaType;
                 renderDetailsPage(data.id, data.mediaType);
                 break;
-            case 'details-local':
-                renderSimpleDetailsPage(data.item);
+            case 'details-anime':
+                renderAnimeDetailsPage(data.animeId);
                 break;
             case 'list-movies':
                 renderListPage('كل الأفلام', () => fetchFromTMDb('discover/movie', { sort_by: 'popularity.desc' }));
@@ -423,10 +409,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 break;
             case 'anime':
             case 'list-anime':
-                renderLocalCategory('anime', 'كل الأنمي');
-                break;
-            case 'list-anime-genre':
-                renderLocalCategory('anime', `أنمي: ${data.genreName}`);
+                renderAnimePage('أنمي', 'top/anime');
                 break;
             case 'list-movies-country':
                 renderListPage(`أفلام ${data.countryName}`, () => fetchFromTMDb('discover/movie', { with_origin_country: data.country, sort_by: 'popularity.desc' }));
@@ -475,6 +458,102 @@ document.addEventListener('DOMContentLoaded', function () {
                 slide.classList.remove('active');
                 dots[i].classList.remove('bg-red-600');
                 dots[i].classList.add('bg-gray-500');
+            });
+            slides[index].classList.add('active');
+            dots[index].classList.add('bg-red-600');
+            dots[index].classList.remove('bg-gray-500');
+            currentSlide = index;
+        };
+
+        const nextSlide = () => {
+            showSlide((currentSlide + 1) % slides.length);
+        };
+
+        if (sliderInterval) clearInterval(sliderInterval);
+        sliderInterval = setInterval(nextSlide, 5000);
+
+        document.getElementById('slider-dots').addEventListener('click', (e) => {
+            if(e.target.matches('.slider-dot')){
+                clearInterval(sliderInterval);
+                showSlide(parseInt(e.target.dataset.index));
+                sliderInterval = setInterval(nextSlide, 5000);
+            }
+        });
+    }
+    
+    document.body.addEventListener('click', (e) => {
+        const animeCard = e.target.closest('[data-anime-id]');
+        if (animeCard) {
+            navigateTo('details-anime', { animeId: animeCard.dataset.animeId });
+            return;
+        }
+
+        const card = e.target.closest('.group[data-id], .view-details-btn[data-id]');
+        if (card) {
+            navigateTo('details', { id: card.dataset.id, mediaType: card.dataset.mediaType });
+            return;
+        }
+
+        const navLink = e.target.closest('.nav-link[data-page]');
+        if (navLink) {
+            e.preventDefault();
+            const page = navLink.dataset.page;
+            const country = navLink.dataset.country;
+            const countryName = navLink.dataset.countryName;
+            const genreName = navLink.dataset.genreName;
+
+            const pageToGo = {
+                'home': 'home',
+                'movies': 'list-movies',
+                'series': 'list-series',
+            }[page] || page;
+
+            navigateTo(pageToGo, { nav_id: page, country, countryName, genreName });
+            document.getElementById('mobile-menu').classList.add('hidden');
+            return;
+        }
+        
+        const categoryCard = e.target.closest('.category-card[data-genre-id]');
+        if (categoryCard) {
+            navigateTo('list-genre', { genreId: categoryCard.dataset.genreId, genreName: categoryCard.dataset.genreName });
+            return;
+        }
+
+        const watchOnlineBtn = e.target.closest('#watch-online-btn');
+        if (watchOnlineBtn) {
+            document.getElementById('watch-section').style.display = 'block';
+            document.getElementById('server-tabs').style.display = 'flex';
+            document.getElementById('video-player').src = watchOnlineBtn.dataset.url;
+            window.scrollTo({ top: document.getElementById('watch-section').offsetTop - 80, behavior: 'smooth' });
+        }
+
+        const serverTab = e.target.closest('.server-tab-btn');
+        if (serverTab) {
+            document.querySelectorAll('.server-tab-btn').forEach(btn => btn.classList.remove('active', 'text-white', 'border-red-500'));
+            serverTab.classList.add('active', 'text-white', 'border-red-500');
+            document.getElementById('video-player').src = serverTab.dataset.url;
+        }
+    });
+    
+    document.getElementById('mobile-menu-button').addEventListener('click', () => {
+        document.getElementById('mobile-menu').classList.toggle('hidden');
+    });
+    
+    document.getElementById('search-input').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter' && e.target.value.trim() !== '') {
+            navigateTo('list-search', { query: e.target.value.trim() });
+            e.target.blur();
+        }
+    });
+
+    // --- INITIAL LOAD ---
+    const initialize = async () => {
+        await fetchAndStoreGenres();
+        navigateTo('home');
+    };
+
+    initialize();
+});-gray-500');
             });
             slides[index].classList.add('active');
             dots[index].classList.add('bg-red-600');
