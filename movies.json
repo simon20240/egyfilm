@@ -1,0 +1,10 @@
+[
+  {
+    "title": "Example Movie 1",
+    "url": "https://archive.org/download/BigBuckBunny_328/BigBuckBunny_512kb.mp4"
+  },
+  {
+    "title": "Example Movie 2",
+    "url": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4"
+  }
+]
