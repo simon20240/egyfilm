@@ -15,6 +15,9 @@
     
     <!-- Custom CSS -->
     <link rel="stylesheet" href="style.css">
+
+    <!-- Fuse.js for fuzzy search -->
+    <script src="https://cdn.jsdelivr.net/npm/fuse.js/dist/fuse.min.js"></script>
 </head>
 <body class="antialiased">
 
@@ -35,11 +38,11 @@
                     <!-- Desktop Navigation -->
                     <div class="hidden md:block">
                         <div class="mr-10 flex items-baseline space-x-4 space-x-reverse">
-                            <a href="#" class="nav-link text-gray-300 hover:text-red-500 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-300" data-page="home">الرئيسية</a>
+                            <a href="#" class="nav-link text-gray-300 hover:text-red-500 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-300" data-page="home" data-lang-key="home">الرئيسية</a>
 
                             <!-- Movies Dropdown -->
                             <div class="relative" data-dropdown>
-                                <button class="nav-link text-gray-300 hover:text-red-500 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-300 flex items-center" data-page="movies">
+                                <button class="nav-link text-gray-300 hover:text-red-500 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-300 flex items-center" data-page="movies" data-lang-key="movies">
                                     أفلام
                                     <svg class="w-4 h-4 ml-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
                                 </button>
@@ -50,14 +53,14 @@
                                         <a href="#" class="nav-link block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white" data-page="list-movies-country" data-country="IN" data-country-name="هندية">هندية</a>
                                         <a href="#" class="nav-link block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white" data-page="list-movies-country" data-country="TR" data-country-name="تركية">تركية</a>
                                         <a href="#" class="nav-link block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white" data-page="list-movies-country" data-country="KR" data-country-name="كورية">كورية</a>
-                                        <a href="#" class="nav-link block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white" data-page="list-movies">الكل</a>
+                                        <a href="#" class="nav-link block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white" data-page="list-movies" data-lang-key="all_movies">الكل</a>
                                     </div>
                                 </div>
                             </div>
 
                             <!-- Series Dropdown -->
                             <div class="relative" data-dropdown>
-                                <button class="nav-link text-gray-300 hover:text-red-500 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-300 flex items-center" data-page="series">
+                                <button class="nav-link text-gray-300 hover:text-red-500 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-300 flex items-center" data-page="series" data-lang-key="series">
                                     مسلسلات
                                     <svg class="w-4 h-4 ml-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
                                 </button>
@@ -68,14 +71,14 @@
                                         <a href="#" class="nav-link block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white" data-page="list-series-country" data-country="IN" data-country-name="هندية">هندية</a>
                                         <a href="#" class="nav-link block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white" data-page="list-series-country" data-country="TR" data-country-name="تركية">تركية</a>
                                         <a href="#" class="nav-link block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white" data-page="list-series-country" data-country="KR" data-country-name="كورية">كورية</a>
-                                        <a href="#" class="nav-link block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white" data-page="list-series">الكل</a>
+                                        <a href="#" class="nav-link block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white" data-page="list-series" data-lang-key="all_series">الكل</a>
                                     </div>
                                 </div>
                             </div>
 
                             <!-- Anime Dropdown -->
                             <div class="relative" data-dropdown>
-                                <button class="nav-link text-gray-300 hover:text-red-500 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-300 flex items-center" data-page="anime">
+                                <button class="nav-link text-gray-300 hover:text-red-500 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-300 flex items-center" data-page="anime" data-lang-key="anime">
                                     أنمي
                                     <svg class="w-4 h-4 ml-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
                                 </button>
@@ -85,14 +88,14 @@
                                         <a href="#" class="nav-link block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white" data-page="list-anime-genre" data-genre="adventure" data-genre-name="مغامرات">مغامرات</a>
                                         <a href="#" class="nav-link block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white" data-page="list-anime-genre" data-genre="comedy" data-genre-name="كوميديا">كوميديا</a>
                                         <a href="#" class="nav-link block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white" data-page="list-anime-genre" data-genre="drama" data-genre-name="دراما">دراما</a>
-                                        <a href="#" class="nav-link block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white" data-page="list-anime">الكل</a>
+                                        <a href="#" class="nav-link block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white" data-page="list-anime" data-lang-key="all_anime">الكل</a>
                                     </div>
                                 </div>
                             </div>
 
                             <!-- Countries Dropdown -->
                             <div class="relative" data-dropdown>
-                                <button class="nav-link text-gray-300 hover:text-red-500 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-300 flex items-center" data-page="countries">
+                                <button class="nav-link text-gray-300 hover:text-red-500 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-300 flex items-center" data-page="countries" data-lang-key="countries">
                                     الدول
                                     <svg class="w-4 h-4 ml-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
                                 </button>
@@ -117,9 +120,23 @@
                     <!-- Search Bar -->
                     <div class="flex-1 max-w-xs mr-4">
                          <div class="relative">
-                            <input id="search-input" type="text" placeholder="ابحث عن أفلام، مسلسلات..." class="w-full bg-gray-800 border border-gray-700 text-white rounded-full py-2 pr-10 pl-4 focus:outline-none focus:ring-2 focus:ring-red-600 transition-all duration-300">
+                            <input id="search-input" type="text" placeholder="ابحث عن أفلام، مسلسلات..." class="w-full bg-gray-800 border border-gray-700 text-white rounded-full py-2 pr-10 pl-4 focus:outline-none focus:ring-2 focus:ring-red-600 transition-all duration-300" data-lang-key="search_placeholder">
                             <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
                                 <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" /></svg>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Language Switcher -->
+                    <div class="relative" data-dropdown>
+                        <button class="text-gray-300 hover:text-red-500 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-300 flex items-center">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a8 8 0 100 16 8 8 0 000-16zM9 14a1 1 0 112 0 1 1 0 01-2 0zM9 6a1 1 0 011-1h.01a1 1 0 110 2H10a1 1 0 01-1-1z"></path></svg>
+                            <span class="mr-1" id="current-lang-text">العربية</span>
+                        </button>
+                        <div class="absolute z-10 mt-2 w-28 rounded-md shadow-lg bg-gray-800 ring-1 ring-black ring-opacity-5 hidden" data-dropdown-menu>
+                            <div class="py-1">
+                                <a href="#" class="lang-switcher block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white" data-lang="ar">العربية</a>
+                                <a href="#" class="lang-switcher block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white" data-lang="en">English</a>
                             </div>
                         </div>
                     </div>
@@ -138,11 +155,11 @@
             <!-- Mobile Menu -->
             <div id="mobile-menu" class="md:hidden hidden">
                 <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-                    <a href="#" class="nav-link text-gray-300 hover:text-red-500 block px-3 py-2 rounded-md text-base font-medium" data-page="home">الرئيسية</a>
-                    <a href="#" class="nav-link text-gray-300 hover:text-red-500 block px-3 py-2 rounded-md text-base font-medium" data-page="movies">أفلام</a>
-                    <a href="#" class="nav-link text-gray-300 hover:text-red-500 block px-3 py-2 rounded-md text-base font-medium" data-page="series">مسلسلات</a>
-                    <a href="#" class="nav-link text-gray-300 hover:text-red-500 block px-3 py-2 rounded-md text-base font-medium" data-page="anime">أنمي</a>
-                    <a href="#" class="nav-link text-gray-300 hover:text-red-500 block px-3 py-2 rounded-md text-base font-medium" data-page="countries">الدول</a>
+                    <a href="#" class="nav-link text-gray-300 hover:text-red-500 block px-3 py-2 rounded-md text-base font-medium" data-page="home" data-lang-key="home">الرئيسية</a>
+                    <a href="#" class="nav-link text-gray-300 hover:text-red-500 block px-3 py-2 rounded-md text-base font-medium" data-page="movies" data-lang-key="movies">أفلام</a>
+                    <a href="#" class="nav-link text-gray-300 hover:text-red-500 block px-3 py-2 rounded-md text-base font-medium" data-page="series" data-lang-key="series">مسلسلات</a>
+                    <a href="#" class="nav-link text-gray-300 hover:text-red-500 block px-3 py-2 rounded-md text-base font-medium" data-page="anime" data-lang-key="anime">أنمي</a>
+                    <a href="#" class="nav-link text-gray-300 hover:text-red-500 block px-3 py-2 rounded-md text-base font-medium" data-page="countries" data-lang-key="countries">الدول</a>
                 </div>
             </div>
         </header>

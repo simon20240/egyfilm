@@ -6,6 +6,23 @@ document.addEventListener('DOMContentLoaded', function () {
     const apiUrl = 'https://api.themoviedb.org/3';
     const imgBaseUrl = 'https://image.tmdb.org/t/p/';
 
+    // --- LANGUAGE & TRANSLATION ---
+    let translations = {};
+    let currentLang = 'ar'; // Default language
+
+    const fetchTranslations = async () => {
+        try {
+            const response = await fetch('languages.json');
+            if (!response.ok) {
+                console.error('Failed to load languages.json');
+                return;
+            }
+            translations = await response.json();
+        } catch (error) {
+            console.error('Error fetching translations:', error);
+        }
+    };
+
     // --- GLOBAL STATE & CONSTANTS ---
     const state = {
         currentPage: 'home',
@@ -13,6 +30,7 @@ document.addEventListener('DOMContentLoaded', function () {
         currentListPage: 1,
         itemsPerPage: 20,
         currentMediaType: 'movie',
+        currentFetchFn: null,
     };
 
     const pages = {
@@ -114,7 +132,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         <p class="mt-4 hidden md:block text-gray-300">${item.overview.substring(0, 150)}...</p>
                         <button class="mt-6 bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-lg transition-colors duration-300 flex items-center space-x-2 space-x-reverse view-details-btn" data-id="${item.id}" data-media-type="${mediaType}">
                             <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.841z"></path></svg>
-                            <span>شاهد الآن</span>
+                            <span data-lang-key="watch_now">شاهد الآن</span>
                         </button>
                     </div>
                 </div>
@@ -123,20 +141,21 @@ document.addEventListener('DOMContentLoaded', function () {
 
         const contentSections = document.getElementById('content-sections');
         const sections = [
-            { title: 'أحدث الأفلام 🎬', items: popularMovies?.results || [] },
-            { title: 'أحدث المسلسلات 📺', items: popularTv?.results || [] },
-            { title: 'الأعلى تقييماً 🎖️', items: topRatedMovies?.results || [] },
-            { title: 'الأكثر مشاهدة 🔥', items: (trending?.results || []).slice(5) },
+            { titleKey: 'latest_movies', title: 'أحدث الأفلام 🎬', items: popularMovies?.results || [] },
+            { titleKey: 'latest_series', title: 'أحدث المسلسلات 📺', items: popularTv?.results || [] },
+            { titleKey: 'top_rated', title: 'الأعلى تقييماً 🎖️', items: topRatedMovies?.results || [] },
+            { titleKey: 'most_watched', title: 'الأكثر مشاهدة 🔥', items: (trending?.results || []).slice(5) },
         ];
         contentSections.innerHTML = sections.map(section => `
             <section class="mb-10">
-                <h2 class="text-2xl font-bold text-white mb-4">${section.title}</h2>
+                <h2 class="text-2xl font-bold text-white mb-4" data-lang-key="${section.titleKey}">${section.title}</h2>
                 <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-6">
                     ${section.items.map(createMovieCard).join('')}
                 </div>
             </section>
         `).join('');
         setupSlider();
+        updateUIText(currentLang);
     };
 
     const renderDetailsPage = async (itemId, mediaType) => {
@@ -293,15 +312,42 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     };
 
-    const renderListPage = async (title, fetchFn) => {
+    const renderListPage = async (title, fetchFn, page = 1) => {
         document.getElementById('list-page-title').textContent = title;
         const grid = document.getElementById('list-page-grid');
-        grid.innerHTML = '<p class="col-span-full text-center text-white">جاري التحميل...</p>';
-        
-        const data = await fetchFn();
+        const pagination = document.getElementById('list-page-pagination');
+
+        let currentFetchFn = fetchFn;
+        if (page > 1 && state.currentFetchFn) {
+            currentFetchFn = state.currentFetchFn;
+        } else {
+            state.currentFetchFn = fetchFn;
+        }
+
+        if (page === 1) {
+            grid.innerHTML = '<p class="col-span-full text-center text-white">جاري التحميل...</p>';
+        }
+
+        const data = await currentFetchFn(page);
         const items = data?.results || [];
 
-        grid.innerHTML = items.length > 0 ? items.map(createMovieCard).join('') : `<p class="col-span-full text-center text-white">لا توجد نتائج.</p>`;
+        if (page === 1) {
+            grid.innerHTML = items.length > 0 ? items.map(createMovieCard).join('') : `<p class="col-span-full text-center text-white">لا توجد نتائج.</p>`;
+        } else {
+            const loadMoreBtn = document.getElementById('load-more-btn');
+            if (loadMoreBtn) {
+                loadMoreBtn.remove();
+            }
+            grid.innerHTML += items.map(createMovieCard).join('');
+        }
+
+        state.currentListPage = page;
+
+        if (data && data.total_pages > page) {
+            pagination.innerHTML = `<button id="load-more-btn" class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">تحميل المزيد</button>`;
+        } else {
+            pagination.innerHTML = '';
+        }
     };
 
     // --- JIKAN API & ANIME FUNCTIONS ---
@@ -359,6 +405,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
         const jikanData = await fetchFromJikan(endpoint, params);
         const items = jikanData?.data || [];
+
+        console.log('Anime items from Jikan API:', items); // Debugging line
 
         if (items.length > 0) {
             grid.innerHTML = items.map(createAnimeCard).join('');
@@ -453,29 +501,30 @@ document.addEventListener('DOMContentLoaded', function () {
                 renderAnimeDetailsPage(data.animeId);
                 break;
             case 'list-movies':
-                renderListPage('كل الأفلام', () => fetchFromTMDb('discover/movie', { sort_by: 'popularity.desc' }));
+                renderListPage('كل الأفلام', (page) => fetchFromTMDb('discover/movie', { sort_by: 'popularity.desc', page: page }));
                 break;
             case 'list-series':
-                renderListPage('كل المسلسلات', () => fetchFromTMDb('discover/tv', { sort_by: 'popularity.desc' }));
+                renderListPage('كل المسلسلات', (page) => fetchFromTMDb('discover/tv', { sort_by: 'popularity.desc', page: page }));
                 break;
             case 'anime':
             case 'list-anime':
-                renderAnimePage('أنمي', 'top/anime', { type: 'ona' });
+                renderAnimePage('أنمي', 'top/anime', { type: 'ona', page: 1, limit: 100 });
                 break;
             case 'list-movies-country':
-                renderListPage(`أفلام ${data.countryName}`, () => fetchFromTMDb('discover/movie', { with_origin_country: data.country, sort_by: 'popularity.desc' }));
+                renderListPage(`أفلام ${data.countryName}`, (page) => fetchFromTMDb('discover/movie', { with_origin_country: data.country, sort_by: 'popularity.desc', page: page }));
                 break;
             case 'list-series-country':
-                renderListPage(`مسلسلات ${data.countryName}`, () => fetchFromTMDb('discover/tv', { with_origin_country: data.country, sort_by: 'popularity.desc' }));
+                renderListPage(`مسلسلات ${data.countryName}`, (page) => fetchFromTMDb('discover/tv', { with_origin_country: data.country, sort_by: 'popularity.desc', page: page }));
                 break;
             case 'list-country':
-                renderListPage(`أفلام ومسلسلات ${data.countryName}`, async () => {
+                renderListPage(`أفلام ومسلسلات ${data.countryName}`, async (page) => {
                     const [movies, series] = await Promise.all([
-                        fetchFromTMDb('discover/movie', { with_origin_country: data.country, sort_by: 'popularity.desc' }),
-                        fetchFromTMDb('discover/tv', { with_origin_country: data.country, sort_by: 'popularity.desc' })
+                        fetchFromTMDb('discover/movie', { with_origin_country: data.country, sort_by: 'popularity.desc', page: page }),
+                        fetchFromTMDb('discover/tv', { with_origin_country: data.country, sort_by: 'popularity.desc', page: page })
                     ]);
                     const combined = [...(movies?.results || []), ...(series?.results || [])];
-                    return { results: combined.sort((a, b) => b.popularity - a.popularity) };
+                    const total_pages = movies.total_pages > series.total_pages ? movies.total_pages : series.total_pages;
+                    return { results: combined.sort((a, b) => b.popularity - a.popularity), total_pages: total_pages };
                 });
                 break;
             case 'list-categories':
@@ -487,15 +536,37 @@ document.addEventListener('DOMContentLoaded', function () {
                  `).join('');
                 break;
             case 'list-genre':
-                renderListPage(`فئة: ${data.genreName}`, () => fetchFromTMDb('discover/movie', { with_genres: data.genreId }));
+                renderListPage(`فئة: ${data.genreName}`, (page) => fetchFromTMDb('discover/movie', { with_genres: data.genreId, page: page }));
                 break;
             case 'list-search':
-                renderListPage(`نتائج البحث عن "${data.query}"`, () => fetchFromTMDb('search/multi', { query: data.query }));
+                renderListPage(`نتائج البحث عن "${data.query}"`, (page) => fetchFromTMDb('search/multi', { query: data.query, page: page }));
                 break;
         }
     };
 
     // --- EVENT HANDLERS & INITIALIZATION ---
+    const updateUIText = (lang) => {
+        currentLang = lang;
+        document.documentElement.lang = lang;
+        document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+
+        const trans = translations[lang];
+        if (!trans) return;
+
+        document.querySelectorAll('[data-lang-key]').forEach(el => {
+            const key = el.dataset.langKey;
+            if (trans[key]) {
+                if (el.tagName === 'INPUT') {
+                    el.placeholder = trans[key];
+                } else {
+                    el.textContent = trans[key];
+                }
+            }
+        });
+
+        document.getElementById('current-lang-text').textContent = lang === 'ar' ? 'العربية' : 'English';
+    };
+
     let currentSlide = 0;
     let sliderInterval;
     const setupSlider = () => {
@@ -533,6 +604,34 @@ document.addEventListener('DOMContentLoaded', function () {
     }
     
     document.body.addEventListener('click', (e) => {
+        const closeAllDropdowns = (except) => {
+            document.querySelectorAll('[data-dropdown-menu]').forEach(menu => {
+                if (menu !== except) {
+                    menu.classList.add('hidden');
+                }
+            });
+        }
+
+        const dropdown = e.target.closest('[data-dropdown]');
+        if (dropdown) {
+            const dropdownMenu = dropdown.querySelector('[data-dropdown-menu]');
+            if (dropdownMenu) {
+                const isHidden = dropdownMenu.classList.contains('hidden');
+                closeAllDropdowns(dropdownMenu);
+                dropdownMenu.classList.toggle('hidden');
+            }
+        } else {
+            closeAllDropdowns();
+        }
+
+        const langSwitcher = e.target.closest('.lang-switcher');
+        if (langSwitcher) {
+            e.preventDefault();
+            const lang = langSwitcher.dataset.lang;
+            updateUIText(lang);
+            return;
+        }
+
         const animeCard = e.target.closest('[data-anime-id]');
         if (animeCard) {
             navigateTo('details-anime', { animeId: animeCard.dataset.animeId });
@@ -584,6 +683,12 @@ document.addEventListener('DOMContentLoaded', function () {
             serverTab.classList.add('active', 'text-white', 'border-red-500');
             document.getElementById('video-player').src = serverTab.dataset.url;
         }
+
+        const loadMoreBtn = e.target.closest('#load-more-btn');
+        if (loadMoreBtn) {
+            const nextPage = state.currentListPage + 1;
+            renderListPage(document.getElementById('list-page-title').textContent, null, nextPage);
+        }
     });
     
     document.getElementById('mobile-menu-button').addEventListener('click', () => {
@@ -599,6 +704,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // --- INITIAL LOAD ---
     const initialize = async () => {
+        await fetchTranslations();
+        updateUIText(currentLang);
         await fetchAndStoreGenres();
         navigateTo('home');
     };
