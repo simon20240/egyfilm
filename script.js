@@ -174,7 +174,8 @@ document.addEventListener('DOMContentLoaded', function () {
         const isSeries = mediaType === 'tv';
 
         const watchId = item.external_ids?.imdb_id || item.id;
-        const watchUrl = isSeries ? `https://vidsrc.to/embed/tv/${watchId}` : `https://vidsrc.to/embed/movie/${watchId}`;
+        // The Doodstream URL will come from your JSON file for uploaded content
+        const watchUrl = item.doodstream_embed_url || (isSeries ? `https://vidsrc.to/embed/tv/${watchId}` : `https://vidsrc.to/embed/movie/${watchId}`);
 
         const watchSectionHTML = `
              <div id="watch-section" class="mt-8 bg-gray-900 rounded-lg overflow-hidden" style="display: none;">
@@ -232,7 +233,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 <div id="server-tabs" class="mt-8 border-b border-gray-700" style="display: none;">
                     <div class="flex space-x-4 space-x-reverse">
                          <button class="server-tab-btn py-2 px-4 text-gray-300 hover:text-white border-b-2 border-transparent hover:border-red-500 transition-colors active text-white border-red-500" data-url="${watchUrl}">سيرفر 1</button>
-                         <button class="server-tab-btn py-2 px-4 text-gray-300 hover:text-white border-b-2 border-transparent hover:border-red-500 transition-colors" data-url="https://multiembed.mov/?video_id=${item.external_ids?.imdb_id}">سيرفر 2</button>
+                         <button class="server-tab-btn py-2 px-4 text-gray-300 hover:text-white border-b-2 border-transparent hover:border-red-500 transition-colors" data-url="https://multiembed.mov/?video_id=${watchId}">سيرفر 2</button>
                     </div>
                 </div>
                 
@@ -465,7 +466,7 @@ document.addEventListener('DOMContentLoaded', function () {
     };
 
     // --- NAVIGATION & PAGE MANAGEMENT ---
-    const navigateTo = (pageName, data = {}) => {
+    const navigateTo = async (pageName, data = {}) => {
         window.scrollTo(0, 0);
         
         Object.values(pages).forEach(p => p.classList.remove('active'));
@@ -490,34 +491,34 @@ document.addEventListener('DOMContentLoaded', function () {
 
         switch(pageName) {
             case 'home':
-                renderHomePage();
+                await renderHomePage();
                 break;
             case 'details':
                 state.currentItemId = data.id;
                 state.currentMediaType = data.mediaType;
-                renderDetailsPage(data.id, data.mediaType);
+                await renderDetailsPage(data.id, data.mediaType);
                 break;
             case 'details-anime':
-                renderAnimeDetailsPage(data.animeId);
+                await renderAnimeDetailsPage(data.animeId);
                 break;
             case 'list-movies':
-                renderListPage('كل الأفلام', (page) => fetchFromTMDb('discover/movie', { sort_by: 'popularity.desc', page: page }));
+                await renderListPage('كل الأفلام', (page) => fetchFromTMDb('discover/movie', { sort_by: 'popularity.desc', page: page }));
                 break;
             case 'list-series':
-                renderListPage('كل المسلسلات', (page) => fetchFromTMDb('discover/tv', { sort_by: 'popularity.desc', page: page }));
+                await renderListPage('كل المسلسلات', (page) => fetchFromTMDb('discover/tv', { sort_by: 'popularity.desc', page: page }));
                 break;
             case 'anime':
             case 'list-anime':
-                renderAnimePage('أنمي', 'top/anime', { type: 'ona', page: 1, limit: 100 });
+                await renderAnimePage('أنمي', 'top/anime', { type: 'ona', page: 1, limit: 100 });
                 break;
             case 'list-movies-country':
-                renderListPage(`أفلام ${data.countryName}`, (page) => fetchFromTMDb('discover/movie', { with_origin_country: data.country, sort_by: 'popularity.desc', page: page }));
+                await renderListPage(`أفلام ${data.countryName}`, (page) => fetchFromTMDb('discover/movie', { with_origin_country: data.country, sort_by: 'popularity.desc', page: page }));
                 break;
             case 'list-series-country':
-                renderListPage(`مسلسلات ${data.countryName}`, (page) => fetchFromTMDb('discover/tv', { with_origin_country: data.country, sort_by: 'popularity.desc', page: page }));
+                await renderListPage(`مسلسلات ${data.countryName}`, (page) => fetchFromTMDb('discover/tv', { with_origin_country: data.country, sort_by: 'popularity.desc', page: page }));
                 break;
             case 'list-country':
-                renderListPage(`أفلام ومسلسلات ${data.countryName}`, async (page) => {
+                await renderListPage(`أفلام ومسلسلات ${data.countryName}`, async (page) => {
                     const [movies, series] = await Promise.all([
                         fetchFromTMDb('discover/movie', { with_origin_country: data.country, sort_by: 'popularity.desc', page: page }),
                         fetchFromTMDb('discover/tv', { with_origin_country: data.country, sort_by: 'popularity.desc', page: page })
@@ -536,14 +537,15 @@ document.addEventListener('DOMContentLoaded', function () {
                  `).join('');
                 break;
             case 'list-genre':
-                renderListPage(`فئة: ${data.genreName}`, (page) => fetchFromTMDb('discover/movie', { with_genres: data.genreId, page: page }));
+                await renderListPage(`فئة: ${data.genreName}`, (page) => fetchFromTMDb('discover/movie', { with_genres: data.genreId, page: page }));
                 break;
             case 'list-search':
-                renderListPage(`نتائج البحث عن "${data.query}"`, (page) => fetchFromTMDb('search/multi', { query: data.query, page: page }));
+                await renderListPage(`نتائج البحث عن "${data.query}"`, (page) => fetchFromTMDb('search/multi', { query: data.query, page: page }));
                 break;
         }
     };
 
+    let player; // Keep a reference to the player instance
     // --- EVENT HANDLERS & INITIALIZATION ---
     const updateUIText = (lang) => {
         currentLang = lang;
@@ -673,6 +675,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if (watchOnlineBtn) {
             document.getElementById('watch-section').style.display = 'block';
             document.getElementById('server-tabs').style.display = 'flex';
+            // Set the src of the iframe to the embed URL
             document.getElementById('video-player').src = watchOnlineBtn.dataset.url;
             window.scrollTo({ top: document.getElementById('watch-section').offsetTop - 80, behavior: 'smooth' });
         }
@@ -681,7 +684,11 @@ document.addEventListener('DOMContentLoaded', function () {
         if (serverTab) {
             document.querySelectorAll('.server-tab-btn').forEach(btn => btn.classList.remove('active', 'text-white', 'border-red-500'));
             serverTab.classList.add('active', 'text-white', 'border-red-500');
-            document.getElementById('video-player').src = serverTab.dataset.url;
+            // Update the iframe src when a server tab is clicked
+            const videoPlayer = document.getElementById('video-player');
+            if (videoPlayer.tagName === 'IFRAME') {
+                videoPlayer.src = serverTab.dataset.url;
+            }
         }
 
         const loadMoreBtn = e.target.closest('#load-more-btn');
@@ -709,6 +716,96 @@ document.addEventListener('DOMContentLoaded', function () {
         await fetchAndStoreGenres();
         navigateTo('home');
     };
+
+    // --- ADMIN DASHBOARD LOGIC ---
+    const adminDashboard = document.getElementById('admin-dashboard');
+    const uploadForm = document.getElementById('upload-form');
+    const uploadStatus = document.getElementById('upload-status');
+    const closeAdminBtn = document.getElementById('close-admin-btn');
+    const submitUploadBtn = document.getElementById('submit-upload-btn');
+    const scrapeCategoryForm = document.getElementById('scrape-category-form');
+    const submitScrapeBtn = document.getElementById('submit-scrape-btn');
+
+    const showAdminDashboard = () => {
+        if (window.location.hash === '#admin') {
+            adminDashboard.classList.remove('hidden');
+        }
+    };
+
+    const hideAdminDashboard = () => {
+        adminDashboard.classList.add('hidden');
+        window.location.hash = '';
+    };
+
+    closeAdminBtn.addEventListener('click', hideAdminDashboard);
+
+    uploadForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const formData = new FormData(uploadForm);
+        const data = Object.fromEntries(formData.entries());
+
+        submitUploadBtn.disabled = true;
+        submitUploadBtn.textContent = 'جاري الرفع، يرجى الانتظار...';
+        uploadStatus.textContent = 'بدء عملية الرفع. قد يستغرق هذا عدة دقائق...';
+
+        try {
+            const response = await fetch('http://localhost:3000/upload', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                uploadStatus.textContent = `تم الرفع بنجاح! ${result.message}`;
+                uploadForm.reset();
+            } else {
+                uploadStatus.textContent = `فشل الرفع: ${result.message}`;
+            }
+        } catch (error) {
+            uploadStatus.textContent = `حدث خطأ في الشبكة: ${error.message}`;
+        } finally {
+            submitUploadBtn.disabled = false;
+            submitUploadBtn.textContent = 'بدء الرفع';
+        }
+    });
+
+    scrapeCategoryForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const formData = new FormData(scrapeCategoryForm);
+        const data = Object.fromEntries(formData.entries());
+
+        submitScrapeBtn.disabled = true;
+        submitScrapeBtn.textContent = 'جاري بدء المسح...';
+        uploadStatus.textContent = 'تم إرسال طلب مسح الفئة. تابع تقدم العملية من خلال الكونسول الخاص بالسيرفر.';
+
+        try {
+            const response = await fetch('http://localhost:3000/scrape-category', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                // The backend will run in the background, so we just give a success message here.
+                uploadStatus.textContent = `تم بدء المسح بنجاح! ${result.message}`;
+            } else {
+                uploadStatus.textContent = `فشل بدء المسح: ${result.message}`;
+            }
+        } catch (error) {
+            uploadStatus.textContent = `حدث خطأ في الشبكة: ${error.message}`;
+        } finally {
+            submitScrapeBtn.disabled = false;
+            submitScrapeBtn.textContent = 'بدء المسح والرفع';
+        }
+    });
+
+    // Check for admin hash on load and on hash change
+    window.addEventListener('hashchange', showAdminDashboard);
+    showAdminDashboard();
 
     initialize();
 });

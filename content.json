@@ -1,23 +1,9 @@
 {
-  "movies": [
+  "movies_to_process": [
     {
-      "title": "Big Buck Bunny",
-      "url": "https://archive.org/download/BigBuckBunny_328/BigBuckBunny_512kb.mp4",
-      "image": "https://peach.blender.org/wp-content/uploads/title_anouncement.jpg?x11217"
-    }
-  ],
-  "series": [
-    {
-      "title": "Elephants Dream",
-      "url": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
-      "image": "https://orange.blender.org/wp-content/themes/orange/images/media/gallery/01_Elephants_Dream_s5_web.jpg"
-    }
-  ],
-  "anime": [
-    {
-      "title": "Example Anime 1",
-      "url": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
-      "image": "https://i.ytimg.com/vi/Dr1iIu33_3s/maxresdefault.jpg"
+      "title": "Meet Joe Black",
+      "url": "https://aflaam.com/movie/3079/meet-joe-black",
+      "image": "https://image.tmdb.org/t/p/original/baH1S0cvdD1sI2tVbHn2LpGZ3gC.jpg"
     }
   ]
 }

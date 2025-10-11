@@ -16,6 +16,10 @@
     <!-- Custom CSS -->
     <link rel="stylesheet" href="style.css">
 
+    <!-- Plyr.io Video Player -->
+    <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
+    <script src="https://cdn.plyr.io/3.7.8/plyr.js"></script>
+
     <!-- Fuse.js for fuzzy search -->
     <script src="https://cdn.jsdelivr.net/npm/fuse.js/dist/fuse.min.js"></script>
 </head>
@@ -232,7 +236,80 @@
 
     </div>
 
+    <!-- Admin Upload Dashboard (Hidden by default) -->
+    <div id="admin-dashboard" class="hidden fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
+        <div class="bg-gray-800 rounded-lg shadow-2xl p-8 w-full max-w-2xl relative text-right">
+            <button id="close-admin-btn" class="absolute top-4 left-4 text-gray-400 hover:text-white">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+            <h2 class="text-2xl font-bold text-white mb-6">لوحة تحكم الرفع</h2>
+            <form id="upload-form">
+                <div class="space-y-4">
+                    <div>
+                        <label for="pageUrl" class="block text-sm font-medium text-gray-300 mb-1">رابط صفحة الفيلم/المسلسل (مثل EgyBest)</label>
+                        <input type="url" name="pageUrl" id="pageUrl" required placeholder="https://egy.best/movie/..." class="w-full bg-gray-700 border border-gray-600 text-white rounded-md p-2 focus:ring-red-500 focus:border-red-500">
+                    </div>
+                </div>
+                <div class="mt-8">
+                    <button id="submit-upload-btn" type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-lg transition-colors disabled:bg-gray-500">
+                        رفع رابط واحد
+                    </button>
+                </div>
+            </form>
+
+            <div class="border-t border-gray-700 my-8"></div>
+
+            <h3 class="text-xl font-bold text-white mb-4">مسح صفحة فئة كاملة</h3>
+            <form id="scrape-category-form">
+                <div class="space-y-4">
+                    <label for="categoryUrl" class="block text-sm font-medium text-gray-300 mb-1">رابط صفحة الفئة (مثل صفحة الأفلام الأجنبية)</label>
+                    <input type="url" name="categoryUrl" id="categoryUrl" required placeholder="https://i-egybest.com/category/..." class="w-full bg-gray-700 border border-gray-600 text-white rounded-md p-2 focus:ring-red-500 focus:border-red-500">
+                </div>
+                <div class="mt-8">
+                    <button id="submit-scrape-btn" type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition-colors disabled:bg-gray-500">
+                        بدء المسح والرفع
+                    </button>
+                </div>
+            </form>
+            <p id="upload-status" class="mt-4 text-center text-gray-400 h-6"></p>
+        </div>
+    </div>
+
     <!-- JavaScript Logic -->
     <script src="script.js"></script>
+
+    <!-- New Search Functionality -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const searchInput = document.getElementById('search-input');
+
+            if (searchInput) {
+                searchInput.addEventListener('input', (event) => {
+                    const query = event.target.value.toLowerCase().trim();
+                    filterVisibleCards(query);
+                });
+            }
+
+            /**
+             * Filters movie/series cards currently visible on the page.
+             * It looks for cards with a `data-title` attribute.
+             * @param {string} query - The search query string.
+             */
+            function filterVisibleCards(query) {
+                // Select all card containers. This selector targets cards on the home page and list pages.
+                const cards = document.querySelectorAll('.group[data-title]');
+
+                cards.forEach(card => {
+                    const title = card.getAttribute('data-title').toLowerCase();
+                    
+                    if (title.includes(query)) {
+                        card.style.display = 'block'; // Show the card if it matches
+                    } else {
+                        card.style.display = 'none'; // Hide the card if it doesn't match
+                    }
+                });
+            }
+        });
+    </script>
 </body>
 </html>

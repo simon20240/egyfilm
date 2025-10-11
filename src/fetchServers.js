@@ -61,7 +61,7 @@ async function main() {
         }
     }
 
-    fs.writeFileSync(`data/${OUTPUT_FILE}`, JSON.stringify(allResults, null, 2));
+    fs.writeFileSync(OUTPUT_FILE, JSON.stringify(allResults, null, 2));
     console.log(`
 --- Finished ---`);
     console.log(`Found links for ${allResults.length} movies. Results saved to ${OUTPUT_FILE}`);
