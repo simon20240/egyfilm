@@ -178,9 +178,9 @@ document.addEventListener('DOMContentLoaded', function () {
         const watchUrl = item.doodstream_embed_url || (isSeries ? `https://vidsrc.to/embed/tv/${watchId}` : `https://vidsrc.to/embed/movie/${watchId}`);
 
         const watchSectionHTML = `
-             <div id="watch-section" class="mt-8 bg-gray-900 rounded-lg overflow-hidden" style="display: none;">
-                <div class="aspect-w-16 aspect-h-9">
-                    <iframe id="video-player" src="" frameborder="0" allowfullscreen class="w-full h-full"></iframe>
+             <div id="watch-section" class="mt-8" style="display: none;">
+                <div class="player-container">
+                    <iframe id="videoPlayer" src="" allowfullscreen frameborder="0" loading="lazy"></iframe>
                 </div>
              </div>`;
 
@@ -323,7 +323,7 @@ document.addEventListener('DOMContentLoaded', function () {
              const episodeCard = e.target.closest('.episode-card');
              if(episodeCard) {
                 document.getElementById('watch-section').style.display = 'block';
-                document.getElementById('video-player').src = episodeCard.dataset.url;
+                document.getElementById('videoPlayer').src = episodeCard.dataset.url;
                 window.scrollTo({ top: document.getElementById('watch-section').offsetTop - 80, behavior: 'smooth' });
              }
         });
@@ -696,14 +696,14 @@ document.addEventListener('DOMContentLoaded', function () {
             subServerButtonsContainer.addEventListener('click', (e) => {
                 const subServerBtn = e.target.closest('.sub-server-btn');
                 if (subServerBtn) {
-                    document.getElementById('video-player').src = subServerBtn.dataset.url;
+                    document.getElementById('videoPlayer').src = subServerBtn.dataset.url;
                 }
             });
 
             // Set the src of the iframe to the first sub-server URL
             const firstSubServer = document.querySelector('.sub-server-btn');
             if (firstSubServer) {
-                document.getElementById('video-player').src = firstSubServer.dataset.url;
+                document.getElementById('videoPlayer').src = firstSubServer.dataset.url;
             }
             window.scrollTo({ top: document.getElementById('watch-section').offsetTop - 80, behavior: 'smooth' });
         }
@@ -713,7 +713,7 @@ document.addEventListener('DOMContentLoaded', function () {
             document.querySelectorAll('.server-tab-btn').forEach(btn => btn.classList.remove('active', 'text-white', 'border-red-500'));
             serverTab.classList.add('active', 'text-white', 'border-red-500');
             // Update the iframe src when a server tab is clicked
-            const videoPlayer = document.getElementById('video-player');
+            const videoPlayer = document.getElementById('videoPlayer');
             if (videoPlayer.tagName === 'IFRAME') {
                 videoPlayer.src = serverTab.dataset.url;
             }
