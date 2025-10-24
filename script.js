@@ -158,6 +158,61 @@ document.addEventListener('DOMContentLoaded', function () {
         updateUIText(currentLang);
     };
 
+    async function getSuperEmbedServers(tmdb_id, imdb_id, isSeries = false, season, episode) {
+        const servers = [];
+
+        const generateUrl = (base, video_id, is_tmdb) => {
+            let url = `${base}?video_id=${video_id}`;
+            if (is_tmdb) url += '&tmdb=1';
+            if (isSeries && season && episode) {
+                url += `&s=${season}&e=${episode}`;
+            }
+            return url;
+        };
+
+        const checkVip = async (video_id, is_tmdb) => {
+            let url = `https://multiembed.mov/directstream.php?video_id=${video_id}&check=1`;
+            if (is_tmdb) url += '&tmdb=1';
+            try {
+                const response = await fetch(url);
+                const text = await response.text();
+                return text.trim() === '1';
+            } catch (error) {
+                console.error(`Error checking for VIP server for ID ${video_id}:`, error);
+                return false;
+            }
+        };
+
+        // VIP servers have priority
+        if (imdb_id && await checkVip(imdb_id, false)) {
+            servers.push({
+                name: "SuperEmbed VIP",
+                url: generateUrl('https://multiembed.mov/directstream.php', imdb_id, false)
+            });
+        } else if (tmdb_id && await checkVip(tmdb_id, true)) {
+            servers.push({
+                name: "SuperEmbed VIP",
+                url: generateUrl('https://multiembed.mov/directstream.php', tmdb_id, true)
+            });
+        }
+
+        // Normal servers
+        if (imdb_id) {
+            servers.push({
+                name: "SuperEmbed IMDb",
+                url: generateUrl('https://multiembed.mov/', imdb_id, false)
+            });
+        }
+        if (tmdb_id) {
+            servers.push({
+                name: "SuperEmbed TMDB",
+                url: generateUrl('https://multiembed.mov/', tmdb_id, true)
+            });
+        }
+
+        return servers;
+    }
+
     const renderDetailsPage = async (itemId, mediaType) => {
         const item = await fetchFromTMDb(`${mediaType}/${itemId}`, { append_to_response: 'videos,credits,external_ids' });
         if (!item) {
@@ -246,17 +301,17 @@ document.addEventListener('DOMContentLoaded', function () {
 
         const subServerButtonsContainer = document.getElementById('sub-server-buttons');
         if (subServerButtonsContainer) {
-            const server2 = {
-                name: 'Server 2',
-                servers: [
-                    { name: 'VidSrc', url: `https://vidsrc.to/embed/movie/${watchId}` },
-                    { name: 'VidSrc Pro', url: `https://vidsrc.pro/embed/movie/${watchId}` },
-                    { name: 'SuperEmbed', url: `https://multiembed.mov/?video_id=${watchId}` },
-                    { name: 'Movie-Embed', url: `https://movie-embed.com/media/tmdb-movie-${watchId}` }
-                ]
-            };
+            const superEmbedServers = await getSuperEmbedServers(item.id, item.external_ids.imdb_id, isSeries);
 
-            subServerButtonsContainer.innerHTML = server2.servers.map(server => `
+            const otherServers = [
+                { name: 'VidSrc', url: `https://vidsrc.to/embed/movie/${watchId}` },
+                { name: 'VidSrc Pro', url: `https://vidsrc.pro/embed/movie/${watchId}` },
+                { name: 'Movie-Embed', url: `https://movie-embed.com/media/tmdb-movie-${watchId}` }
+            ];
+
+            const allServers = superEmbedServers.concat(otherServers);
+
+            subServerButtonsContainer.innerHTML = allServers.map(server => `
                 <button class="sub-server-btn bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg transition-colors" data-url="${server.url}">${server.name}</button>
             `).join('');
         }

@@ -1,0 +1,22 @@
+[
+  {
+    "title": "Meet Joe Black",
+    "url": "https://aflaam.com/movie/3079/meet-joe-black",
+    "image": "https://image.tmdb.org/t/p/original/baH1S0cvdD1sI2tVbHn2LpGZ3gC.jpg",
+    "servers": [
+      {
+        "name": "SuperEmbed",
+        "sub_servers": [
+          {
+            "name": "SuperEmbed IMDb",
+            "url": "https://multiembed.mov/?video_id=tt1234567"
+          },
+          {
+            "name": "SuperEmbed TMDB",
+            "url": "https://multiembed.mov/?video_id=12345&tmdb=1"
+          }
+        ]
+      }
+    ]
+  }
+]

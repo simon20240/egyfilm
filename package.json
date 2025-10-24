@@ -9,10 +9,11 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "commonjs",
+  "type": "module",
   "dependencies": {
     "axios": "^1.12.2",
     "dotenv": "^17.2.3",
-    "node-fetch": "^2.7.0"
+    "node-fetch": "^2.7.0",
+    "tmdb-ts": "^2.0.2"
   }
 }
