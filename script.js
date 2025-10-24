@@ -231,9 +231,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 </div>
                 
                 <div id="server-tabs" class="mt-8 border-b border-gray-700" style="display: none;">
-                    <div class="flex space-x-4 space-x-reverse">
-                         <button class="server-tab-btn py-2 px-4 text-gray-300 hover:text-white border-b-2 border-transparent hover:border-red-500 transition-colors active text-white border-red-500" data-url="${watchUrl}">سيرفر 1</button>
-                         <button class="server-tab-btn py-2 px-4 text-gray-300 hover:text-white border-b-2 border-transparent hover:border-red-500 transition-colors" data-url="https://multiembed.mov/?video_id=${watchId}">سيرفر 2</button>
+                    <div id="sub-server-buttons" class="flex flex-wrap gap-2">
+                        <!-- Sub-server buttons will be injected here -->
                     </div>
                 </div>
                 
@@ -243,6 +242,23 @@ document.addEventListener('DOMContentLoaded', function () {
         
         if (isSeries) {
             renderSeasons(item);
+        }
+
+        const subServerButtonsContainer = document.getElementById('sub-server-buttons');
+        if (subServerButtonsContainer) {
+            const server2 = {
+                name: 'Server 2',
+                servers: [
+                    { name: 'VidSrc', url: `https://vidsrc.to/embed/movie/${watchId}` },
+                    { name: 'VidSrc Pro', url: `https://vidsrc.pro/embed/movie/${watchId}` },
+                    { name: 'SuperEmbed', url: `https://multiembed.mov/?video_id=${watchId}` },
+                    { name: 'Movie-Embed', url: `https://movie-embed.com/media/tmdb-movie-${watchId}` }
+                ]
+            };
+
+            subServerButtonsContainer.innerHTML = server2.servers.map(server => `
+                <button class="sub-server-btn bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg transition-colors" data-url="${server.url}">${server.name}</button>
+            `).join('');
         }
     };
 
@@ -674,9 +690,21 @@ document.addEventListener('DOMContentLoaded', function () {
         const watchOnlineBtn = e.target.closest('#watch-online-btn');
         if (watchOnlineBtn) {
             document.getElementById('watch-section').style.display = 'block';
-            document.getElementById('server-tabs').style.display = 'flex';
-            // Set the src of the iframe to the embed URL
-            document.getElementById('video-player').src = watchOnlineBtn.dataset.url;
+            document.getElementById('server-tabs').style.display = 'block'; // Changed to block
+
+            const subServerButtonsContainer = document.getElementById('sub-server-buttons');
+            subServerButtonsContainer.addEventListener('click', (e) => {
+                const subServerBtn = e.target.closest('.sub-server-btn');
+                if (subServerBtn) {
+                    document.getElementById('video-player').src = subServerBtn.dataset.url;
+                }
+            });
+
+            // Set the src of the iframe to the first sub-server URL
+            const firstSubServer = document.querySelector('.sub-server-btn');
+            if (firstSubServer) {
+                document.getElementById('video-player').src = firstSubServer.dataset.url;
+            }
             window.scrollTo({ top: document.getElementById('watch-section').offsetTop - 80, behavior: 'smooth' });
         }
 
