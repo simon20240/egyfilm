@@ -108,6 +108,9 @@ document.addEventListener('DOMContentLoaded', function () {
     };
 
     const renderHomePage = async () => {
+        SEO.updateMetadata('home');
+        SEO.injectStructuredData('home');
+
         const [trending, popularMovies, popularTv, topRatedMovies] = await Promise.all([
             fetchFromTMDb('trending/all/week'),
             fetchFromTMDb('movie/popular'),
@@ -228,6 +231,10 @@ document.addEventListener('DOMContentLoaded', function () {
         const cast = item.credits?.cast?.slice(0, 5).map(c => c.name).join(', ');
         const isSeries = mediaType === 'tv';
 
+        // Update SEO
+        SEO.updateMetadata('details', { item, mediaType });
+        SEO.injectStructuredData('details', { item, mediaType });
+
         const watchId = item.external_ids?.imdb_id || item.id;
         // The Doodstream URL will come from your JSON file for uploaded content
         const watchUrl = item.doodstream_embed_url || (isSeries ? `https://vidsrc.to/embed/tv/${watchId}` : `https://vidsrc.to/embed/movie/${watchId}`);
@@ -305,7 +312,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             const otherServers = [
                 { name: 'VidSrc', url: `https://vidsrc.to/embed/movie/${watchId}` },
-                { name: 'VidSrc Pro', url: `https://vidsrc.pro/embed/movie/${watchId}` },
+                { name: 'VidSrc Pro', url: isSeries || !item.external_ids?.imdb_id ? `https://vidsrc.pro/embed/movie/${watchId}` : `https://vidsrc.pro/embed/movie/${item.external_ids.imdb_id}?sub.file=/api/subtitle?imdbId=${item.external_ids.imdb_id}&sub.label=Arabic` },
                 { name: 'Movie-Embed', url: `https://movie-embed.com/media/tmdb-movie-${watchId}` }
             ];
 
