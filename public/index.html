@@ -1,0 +1,329 @@
+!DOCTYPE html>
+<html lang="ar" dir="rtl" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EgyFilm - مشاهدة الأفلام والمسلسلات</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts: Cairo for Arabic -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://image.tmdb.org" />
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="style.css">
+
+    <!-- Plyr.io Video Player -->
+    <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
+    <script src="https://cdn.plyr.io/3.7.8/plyr.js"></script>
+
+    <!-- Fuse.js for fuzzy search -->
+    <script src="https://cdn.jsdelivr.net/npm/fuse.js/dist/fuse.min.js"></script>
+    <meta name="google-site-verification" content="Rh6G9ERTzX2tplKySIBsWxuRuLkNBJ2LBqPoQLTP13Q" />
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-BJNKS3RBRL"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-BJNKS3RBRL');
+    </script>
+</head>
+<body class="antialiased">
+
+    <!-- App Container -->
+    <div id="app" class="min-h-screen">
+
+        <!-- Header -->
+        <header class="bg-gray-900/80 backdrop-blur-lg sticky top-0 z-40 shadow-lg shadow-black/20">
+            <nav class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex items-center justify-between h-16">
+                    <!-- Logo -->
+                    <div class="flex-shrink-0">
+                        <a href="#" class="text-2xl font-extrabold tracking-wider nav-link" data-page="home">
+                            <span class="text-red-600">Egy</span><span class="text-white">Film</span>
+                        </a>
+                    </div>
+
+                    <!-- Desktop Navigation -->
+                    <div class="hidden md:block">
+                        <div class="mr-10 flex items-baseline space-x-4 space-x-reverse">
+                            <a href="#" class="nav-link text-gray-300 hover:text-red-500 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-300" data-page="home" data-lang-key="home">الرئيسية</a>
+
+                            <!-- Movies Dropdown -->
+                            <div class="relative" data-dropdown>
+                                <button class="nav-link text-gray-300 hover:text-red-500 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-300 flex items-center" data-page="movies" data-lang-key="movies">
+                                    أفلام
+                                    <svg class="w-4 h-4 ml-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+                                </button>
+                                <div class="absolute z-10 mt-2 w-48 rounded-md shadow-lg bg-gray-800 ring-1 ring-black ring-opacity-5 hidden" data-dropdown-menu>
+                                    <div class="py-1">
+                                        <a href="#" class="nav-link block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white" data-page="list-movies-country" data-country="US" data-country-name="أمريكية">أمريكية</a>
+                                        <a href="#" class="nav-link block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white" data-page="list-movies-country" data-country="EG" data-country-name="عربية">عربية</a>
+                                        <a href="#" class="nav-link block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white" data-page="list-movies-country" data-country="IN" data-country-name="هندية">هندية</a>
+                                        <a href="#" class="nav-link block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white" data-page="list-movies-country" data-country="TR" data-country-name="تركية">تركية</a>
+                                        <a href="#" class="nav-link block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white" data-page="list-movies-country" data-country="KR" data-country-name="كورية">كورية</a>
+                                        <a href="#" class="nav-link block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white" data-page="list-movies" data-lang-key="all_movies">الكل</a>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Series Dropdown -->
+                            <div class="relative" data-dropdown>
+                                <button class="nav-link text-gray-300 hover:text-red-500 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-300 flex items-center" data-page="series" data-lang-key="series">
+                                    مسلسلات
+                                    <svg class="w-4 h-4 ml-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+                                </button>
+                                <div class="absolute z-10 mt-2 w-48 rounded-md shadow-lg bg-gray-800 ring-1 ring-black ring-opacity-5 hidden" data-dropdown-menu>
+                                    <div class="py-1">
+                                        <a href="#" class="nav-link block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white" data-page="list-series-country" data-country="US" data-country-name="أمريكية">أمريكية</a>
+                                        <a href="#" class="nav-link block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white" data-page="list-series-country" data-country="EG" data-country-name="عربية">عربية</a>
+                                        <a href="#" class="nav-link block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white" data-page="list-series-country" data-country="IN" data-country-name="هندية">هندية</a>
+                                        <a href="#" class="nav-link block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white" data-page="list-series-country" data-country="TR" data-country-name="تركية">تركية</a>
+                                        <a href="#" class="nav-link block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white" data-page="list-series-country" data-country="KR" data-country-name="كورية">كورية</a>
+                                        <a href="#" class="nav-link block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white" data-page="list-series" data-lang-key="all_series">الكل</a>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Anime Dropdown -->
+                            <div class="relative" data-dropdown>
+                                <button class="nav-link text-gray-300 hover:text-red-500 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-300 flex items-center" data-page="anime" data-lang-key="anime">
+                                    أنمي
+                                    <svg class="w-4 h-4 ml-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+                                </button>
+                                <div class="absolute z-10 mt-2 w-48 rounded-md shadow-lg bg-gray-800 ring-1 ring-black ring-opacity-5 hidden" data-dropdown-menu>
+                                    <div class="py-1">
+                                        <a href="#" class="nav-link block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white" data-page="list-anime-genre" data-genre="action" data-genre-name="أكشن">أكشن</a>
+                                        <a href="#" class="nav-link block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white" data-page="list-anime-genre" data-genre="adventure" data-genre-name="مغامرات">مغامرات</a>
+                                        <a href="#" class="nav-link block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white" data-page="list-anime-genre" data-genre="comedy" data-genre-name="كوميديا">كوميديا</a>
+                                        <a href="#" class="nav-link block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white" data-page="list-anime-genre" data-genre="drama" data-genre-name="دراما">دراما</a>
+                                        <a href="#" class="nav-link block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white" data-page="list-anime" data-lang-key="all_anime">الكل</a>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Countries Dropdown -->
+                            <div class="relative" data-dropdown>
+                                <button class="nav-link text-gray-300 hover:text-red-500 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-300 flex items-center" data-page="countries" data-lang-key="countries">
+                                    الدول
+                                    <svg class="w-4 h-4 ml-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+                                </button>
+                                <div class="absolute z-10 mt-2 w-48 rounded-md shadow-lg bg-gray-800 ring-1 ring-black ring-opacity-5 hidden" data-dropdown-menu>
+                                    <div class="py-1">
+                                        <a href="#" class="nav-link block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white" data-page="list-country" data-country="US" data-country-name="الولايات المتحدة">الولايات المتحدة</a>
+                                        <a href="#" class="nav-link block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white" data-page="list-country" data-country="EG" data-country-name="مصر">مصر</a>
+                                        <a href="#" class="nav-link block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white" data-page="list-country" data-country="IN" data-country-name="الهند">الهند</a>
+                                        <a href="#" class="nav-link block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white" data-page="list-country" data-country="TR" data-country-name="تركيا">تركيا</a>
+                                        <a href="#" class="nav-link block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white" data-page="list-country" data-country="KR" data-country-name="كوريا">كوريا</a>
+                                        <a href="#" class="nav-link block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white" data-page="list-country" data-country="GB" data-country-name="بريطانيا">بريطانيا</a>
+                                        <a href="#" class="nav-link block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white" data-page="list-country" data-country="FR" data-country-name="فرنسا">فرنسا</a>
+                                        <a href="#" class="nav-link block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white" data-page="list-country" data-country="ES" data-country-name="إسبانيا">إسبانيا</a>
+                                        <a href="#" class="nav-link block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white" data-page="list-country" data-country="JP" data-country-name="اليابان">اليابان</a>
+                                        <a href="#" class="nav-link block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white" data-page="list-country" data-country="CN" data-country-name="الصين">الصين</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Search Bar -->
+                    <div class="flex-1 max-w-xs mr-4">
+                         <div class="relative">
+                            <input id="search-input" type="text" placeholder="ابحث عن أفلام، مسلسلات..." class="w-full bg-gray-800 border border-gray-700 text-white rounded-full py-2 pr-10 pl-4 focus:outline-none focus:ring-2 focus:ring-red-600 transition-all duration-300" data-lang-key="search_placeholder">
+                            <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" /></svg>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Language Switcher -->
+                    <div class="relative" data-dropdown>
+                        <button class="text-gray-300 hover:text-red-500 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-300 flex items-center">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a8 8 0 100 16 8 8 0 000-16zM9 14a1 1 0 112 0 1 1 0 01-2 0zM9 6a1 1 0 011-1h.01a1 1 0 110 2H10a1 1 0 01-1-1z"></path></svg>
+                            <span class="mr-1" id="current-lang-text">العربية</span>
+                        </button>
+                        <div class="absolute z-10 mt-2 w-28 rounded-md shadow-lg bg-gray-800 ring-1 ring-black ring-opacity-5 hidden" data-dropdown-menu>
+                            <div class="py-1">
+                                <a href="#" class="lang-switcher block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white" data-lang="ar">العربية</a>
+                                <a href="#" class="lang-switcher block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white" data-lang="en">English</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Mobile Menu Button -->
+                    <div class="md:hidden flex items-center mr-4">
+                        <button id="mobile-menu-button" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white">
+                            <span class="sr-only">Open main menu</span>
+                            <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </nav>
+            <!-- Mobile Menu -->
+            <div id="mobile-menu" class="md:hidden hidden">
+                <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                    <a href="#" class="nav-link text-gray-300 hover:text-red-500 block px-3 py-2 rounded-md text-base font-medium" data-page="home" data-lang-key="home">الرئيسية</a>
+                    <a href="#" class="nav-link text-gray-300 hover:text-red-500 block px-3 py-2 rounded-md text-base font-medium" data-page="movies" data-lang-key="movies">أفلام</a>
+                    <a href="#" class="nav-link text-gray-300 hover:text-red-500 block px-3 py-2 rounded-md text-base font-medium" data-page="series" data-lang-key="series">مسلسلات</a>
+                    <a href="#" class="nav-link text-gray-300 hover:text-red-500 block px-3 py-2 rounded-md text-base font-medium" data-page="anime" data-lang-key="anime">أنمي</a>
+                    <a href="#" class="nav-link text-gray-300 hover:text-red-500 block px-3 py-2 rounded-md text-base font-medium" data-page="countries" data-lang-key="countries">الدول</a>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main>
+            <!-- Home Page -->
+            <div id="home-page" class="page active">
+                <!-- Slider Section -->
+                <section id="slider-section" class="relative h-[60vh] md:h-[80vh] w-full overflow-hidden">
+                    <div id="slider-container" class="relative h-full">
+                        <!-- Slider items will be injected here -->
+                    </div>
+                    <div class="absolute bottom-5 left-1/2 -translate-x-1/2 z-10 flex space-x-2 space-x-reverse" id="slider-dots">
+                        <!-- Dots will be injected here -->
+                    </div>
+                </section>
+
+                <!-- Telegram Banner -->
+                <div class="bg-red-600 text-white text-center p-3">
+                    <a href="#" class="font-semibold underline">اشترك في قناتنا على تليجرام لآخر التحديثات!</a>
+                </div>
+
+                <!-- Content Sections -->
+                <div id="content-sections" class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                    <!-- Sections will be injected here -->
+                </div>
+            </div>
+
+            <!-- Details Page -->
+            <div id="details-page" class="page">
+                <!-- Details content will be injected here -->
+            </div>
+
+            <!-- Generic List Page (for movies, series, categories, search results) -->
+            <div id="list-page" class="page">
+                <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                    <h2 id="list-page-title" class="text-3xl font-bold text-white mb-6"></h2>
+                    <div id="list-page-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-6">
+                        <!-- Movie cards will be injected here -->
+                    </div>
+                    <div id="list-page-pagination" class="flex justify-center mt-8">
+                        <!-- Pagination controls will be injected here -->
+                    </div>
+                </div>
+            </div>
+        </main>
+        
+        <!-- Footer -->
+        <footer class="bg-gray-900 border-t border-gray-800 mt-12">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                <div class="flex flex-col md:flex-row justify-between items-center text-center md:text-right">
+                    <div class="mb-4 md:mb-0">
+                         <a href="#" class="text-2xl font-extrabold tracking-wider" data-page="home">
+                            <span class="text-red-600">Egy</span><span class="text-white">Film</span>
+                        </a>
+                        <p class="text-sm text-gray-400 mt-2">مصدرك لأحدث الأفلام والمسلسلات.</p>
+                    </div>
+                    <div class="flex space-x-6 space-x-reverse">
+                        <a href="#" class="text-gray-400 hover:text-red-500 transition-colors">اتصل بنا</a>
+                        <a href="#" class="text-gray-400 hover:text-red-500 transition-colors">سياسة الخصوصية</a>
+                        <a href="#" class="text-gray-400 hover:text-red-500 transition-colors">حقوق النشر</a>
+                    </div>
+                </div>
+                <div class="mt-8 border-t border-gray-700 pt-4 text-center text-gray-500 text-sm">
+                    <p>&copy; 2025 EgyFilm. جميع الحقوق محفوظة. هذا الموقع لا يخزن أي ملفات على خوادمه.</p>
+                </div>
+            </div>
+        </footer>
+
+    </div>
+
+    <!-- Admin Upload Dashboard (Hidden by default) -->
+    <div id="admin-dashboard" class="hidden fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
+        <div class="bg-gray-800 rounded-lg shadow-2xl p-8 w-full max-w-2xl relative text-right">
+            <button id="close-admin-btn" class="absolute top-4 left-4 text-gray-400 hover:text-white">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+            <h2 class="text-2xl font-bold text-white mb-6">لوحة تحكم الرفع</h2>
+            <form id="upload-form">
+                <div class="space-y-4">
+                    <div>
+                        <label for="pageUrl" class="block text-sm font-medium text-gray-300 mb-1">رابط صفحة الفيلم/المسلسل (مثل EgyBest)</label>
+                        <input type="url" name="pageUrl" id="pageUrl" required placeholder="https://egy.best/movie/..." class="w-full bg-gray-700 border border-gray-600 text-white rounded-md p-2 focus:ring-red-500 focus:border-red-500">
+                    </div>
+                </div>
+                <div class="mt-8">
+                    <button id="submit-upload-btn" type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-lg transition-colors disabled:bg-gray-500">
+                        رفع رابط واحد
+                    </button>
+                </div>
+            </form>
+
+            <div class="border-t border-gray-700 my-8"></div>
+
+            <h3 class="text-xl font-bold text-white mb-4">مسح صفحة فئة كاملة</h3>
+            <form id="scrape-category-form">
+                <div class="space-y-4">
+                    <label for="categoryUrl" class="block text-sm font-medium text-gray-300 mb-1">رابط صفحة الفئة (مثل صفحة الأفلام الأجنبية)</label>
+                    <input type="url" name="categoryUrl" id="categoryUrl" required placeholder="https://i-egybest.com/category/..." class="w-full bg-gray-700 border border-gray-600 text-white rounded-md p-2 focus:ring-red-500 focus:border-red-500">
+                </div>
+                <div class="mt-8">
+                    <button id="submit-scrape-btn" type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition-colors disabled:bg-gray-500">
+                        بدء المسح والرفع
+                    </button>
+                </div>
+            </form>
+            <p id="upload-status" class="mt-4 text-center text-gray-400 h-6"></p>
+        </div>
+    </div>
+
+    <!-- SEO Logic -->
+    <script src="seo.js"></script>
+
+    <!-- JavaScript Logic -->
+    <script src="script.js"></script>
+
+    <!-- New Search Functionality -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const searchInput = document.getElementById('search-input');
+
+            if (searchInput) {
+                searchInput.addEventListener('input', (event) => {
+                    const query = event.target.value.toLowerCase().trim();
+                    filterVisibleCards(query);
+                });
+            }
+
+            /**
+             * Filters movie/series cards currently visible on the page.
+             * It looks for cards with a `data-title` attribute.
+             * @param {string} query - The search query string.
+             */
+            function filterVisibleCards(query) {
+                // Select all card containers. This selector targets cards on the home page and list pages.
+                const cards = document.querySelectorAll('.group[data-title]');
+
+                cards.forEach(card => {
+                    const title = card.getAttribute('data-title').toLowerCase();
+                    
+                    if (title.includes(query)) {
+                        card.style.display = 'block'; // Show the card if it matches
+                    } else {
+                        card.style.display = 'none'; // Hide the card if it doesn't match
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
