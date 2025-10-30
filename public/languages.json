@@ -1,0 +1,34 @@
+{
+  "ar": {
+    "home": "الرئيسية",
+    "movies": "أفلام",
+    "series": "مسلسلات",
+    "anime": "أنمي",
+    "countries": "الدول",
+    "all_movies": "الكل",
+    "all_series": "الكل",
+    "all_anime": "الكل",
+    "search_placeholder": "ابحث عن أفلام، مسلسلات...",
+    "watch_now": "شاهد الآن",
+    "latest_movies": "أحدث الأفلام 🎬",
+    "latest_series": "أحدث المسلسلات 📺",
+    "top_rated": "الأعلى تقييماً 🎖️",
+    "most_watched": "الأكثر مشاهدة 🔥"
+  },
+  "en": {
+    "home": "Home",
+    "movies": "Movies",
+    "series": "Series",
+    "anime": "Anime",
+    "countries": "Countries",
+    "all_movies": "All",
+    "all_series": "All",
+    "all_anime": "All",
+    "search_placeholder": "Search for movies, series...",
+    "watch_now": "Watch Now",
+    "latest_movies": "Latest Movies 🎬",
+    "latest_series": "Latest Series 📺",
+    "top_rated": "Top Rated 🎖️",
+    "most_watched": "Most Watched 🔥"
+  }
+}
