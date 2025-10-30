@@ -39,13 +39,12 @@
     <!-- App Container -->
     <div id="app" class="min-h-screen">
 
-        <!-- Header -->
         <header class="bg-gray-900/80 backdrop-blur-lg sticky top-0 z-40 shadow-lg shadow-black/20">
             <nav class="container mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex items-center justify-between h-16">
                     <!-- Logo -->
                     <div class="flex-shrink-0">
-                        <a href="#" class="text-2xl font-extrabold tracking-wider nav-link" data-page="home">
+                        <a href="/" class="text-2xl font-extrabold tracking-wider nav-link">
                             <span class="text-red-600">Egy</span><span class="text-white">Film</span>
                         </a>
                     </div>
@@ -53,79 +52,79 @@
                     <!-- Desktop Navigation -->
                     <div class="hidden md:block">
                         <div class="mr-10 flex items-baseline space-x-4 space-x-reverse">
-                            <a href="#" class="nav-link text-gray-300 hover:text-red-500 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-300" data-page="home" data-lang-key="home">الرئيسية</a>
+                            <a href="/" class="nav-link text-gray-300 hover:text-red-500 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-300" data-lang-key="home">الرئيسية</a>
 
                             <!-- Movies Dropdown -->
                             <div class="relative" data-dropdown>
-                                <button class="nav-link text-gray-300 hover:text-red-500 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-300 flex items-center" data-page="movies" data-lang-key="movies">
+                                <button class="text-gray-300 hover:text-red-500 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-300 flex items-center" data-lang-key="movies">
                                     أفلام
                                     <svg class="w-4 h-4 ml-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
                                 </button>
                                 <div class="absolute z-10 mt-2 w-48 rounded-md shadow-lg bg-gray-800 ring-1 ring-black ring-opacity-5 hidden" data-dropdown-menu>
                                     <div class="py-1">
-                                        <a href="#" class="nav-link block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white" data-page="list-movies-country" data-country="US" data-country-name="أمريكية">أمريكية</a>
-                                        <a href="#" class="nav-link block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white" data-page="list-movies-country" data-country="EG" data-country-name="عربية">عربية</a>
-                                        <a href="#" class="nav-link block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white" data-page="list-movies-country" data-country="IN" data-country-name="هندية">هندية</a>
-                                        <a href="#" class="nav-link block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white" data-page="list-movies-country" data-country="TR" data-country-name="تركية">تركية</a>
-                                        <a href="#" class="nav-link block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white" data-page="list-movies-country" data-country="KR" data-country-name="كورية">كورية</a>
-                                        <a href="#" class="nav-link block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white" data-page="list-movies" data-lang-key="all_movies">الكل</a>
+                                        <a href="/list/movies/country/US" class="nav-link block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white" data-country-name="أمريكية">أمريكية</a>
+                                        <a href="/list/movies/country/EG" class="nav-link block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white" data-country-name="عربية">عربية</a>
+                                        <a href="/list/movies/country/IN" class="nav-link block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white" data-country-name="هندية">هندية</a>
+                                        <a href="/list/movies/country/TR" class="nav-link block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white" data-country-name="تركية">تركية</a>
+                                        <a href="/list/movies/country/KR" class="nav-link block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white" data-country-name="كورية">كورية</a>
+                                        <a href="/list/movies" class="nav-link block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white" data-lang-key="all_movies">الكل</a>
                                     </div>
                                 </div>
                             </div>
 
                             <!-- Series Dropdown -->
                             <div class="relative" data-dropdown>
-                                <button class="nav-link text-gray-300 hover:text-red-500 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-300 flex items-center" data-page="series" data-lang-key="series">
+                                <button class="text-gray-300 hover:text-red-500 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-300 flex items-center" data-lang-key="series">
                                     مسلسلات
                                     <svg class="w-4 h-4 ml-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
                                 </button>
                                 <div class="absolute z-10 mt-2 w-48 rounded-md shadow-lg bg-gray-800 ring-1 ring-black ring-opacity-5 hidden" data-dropdown-menu>
                                     <div class="py-1">
-                                        <a href="#" class="nav-link block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white" data-page="list-series-country" data-country="US" data-country-name="أمريكية">أمريكية</a>
-                                        <a href="#" class="nav-link block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white" data-page="list-series-country" data-country="EG" data-country-name="عربية">عربية</a>
-                                        <a href="#" class="nav-link block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white" data-page="list-series-country" data-country="IN" data-country-name="هندية">هندية</a>
-                                        <a href="#" class="nav-link block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white" data-page="list-series-country" data-country="TR" data-country-name="تركية">تركية</a>
-                                        <a href="#" class="nav-link block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white" data-page="list-series-country" data-country="KR" data-country-name="كورية">كورية</a>
-                                        <a href="#" class="nav-link block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white" data-page="list-series" data-lang-key="all_series">الكل</a>
+                                        <a href="/list/series/country/US" class="nav-link block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white" data-country-name="أمريكية">أمريكية</a>
+                                        <a href="/list/series/country/EG" class="nav-link block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white" data-country-name="عربية">عربية</a>
+                                        <a href="/list/series/country/IN" class="nav-link block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white" data-country-name="هندية">هندية</a>
+                                        <a href="/list/series/country/TR" class="nav-link block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white" data-country-name="تركية">تركية</a>
+                                        <a href="/list/series/country/KR" class="nav-link block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white" data-country-name="كورية">كورية</a>
+                                        <a href="/list/series" class="nav-link block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white" data-lang-key="all_series">الكل</a>
                                     </div>
                                 </div>
                             </div>
 
                             <!-- Anime Dropdown -->
                             <div class="relative" data-dropdown>
-                                <button class="nav-link text-gray-300 hover:text-red-500 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-300 flex items-center" data-page="anime" data-lang-key="anime">
+                                <button class="text-gray-300 hover:text-red-500 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-300 flex items-center" data-lang-key="anime">
                                     أنمي
                                     <svg class="w-4 h-4 ml-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
                                 </button>
                                 <div class="absolute z-10 mt-2 w-48 rounded-md shadow-lg bg-gray-800 ring-1 ring-black ring-opacity-5 hidden" data-dropdown-menu>
                                     <div class="py-1">
-                                        <a href="#" class="nav-link block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white" data-page="list-anime-genre" data-genre="action" data-genre-name="أكشن">أكشن</a>
-                                        <a href="#" class="nav-link block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white" data-page="list-anime-genre" data-genre="adventure" data-genre-name="مغامرات">مغامرات</a>
-                                        <a href="#" class="nav-link block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white" data-page="list-anime-genre" data-genre="comedy" data-genre-name="كوميديا">كوميديا</a>
-                                        <a href="#" class="nav-link block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white" data-page="list-anime-genre" data-genre="drama" data-genre-name="دراما">دراما</a>
-                                        <a href="#" class="nav-link block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white" data-page="list-anime" data-lang-key="all_anime">الكل</a>
+                                        <a href="/list/anime/genre/action" class="nav-link block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white" data-genre-name="أكشن">أكشن</a>
+                                        <a href="/list/anime/genre/adventure" class="nav-link block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white" data-genre-name="مغامرات">مغامرات</a>
+                                        <a href="/list/anime/genre/comedy" class="nav-link block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white" data-genre-name="كوميديا">كوميديا</a>
+                                        <a href="/list/anime/genre/drama" class="nav-link block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white" data-genre-name="دراما">دراما</a>
+                                        <a href="/list/anime" class="nav-link block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white" data-lang-key="all_anime">الكل</a>
                                     </div>
                                 </div>
                             </div>
 
                             <!-- Countries Dropdown -->
                             <div class="relative" data-dropdown>
-                                <button class="nav-link text-gray-300 hover:text-red-500 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-300 flex items-center" data-page="countries" data-lang-key="countries">
+                                <button class="text-gray-300 hover:text-red-500 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-300 flex items-center" data-lang-key="countries">
                                     الدول
                                     <svg class="w-4 h-4 ml-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
                                 </button>
                                 <div class="absolute z-10 mt-2 w-48 rounded-md shadow-lg bg-gray-800 ring-1 ring-black ring-opacity-5 hidden" data-dropdown-menu>
                                     <div class="py-1">
-                                        <a href="#" class="nav-link block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white" data-page="list-country" data-country="US" data-country-name="الولايات المتحدة">الولايات المتحدة</a>
-                                        <a href="#" class="nav-link block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white" data-page="list-country" data-country="EG" data-country-name="مصر">مصر</a>
-                                        <a href="#" class="nav-link block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white" data-page="list-country" data-country="IN" data-country-name="الهند">الهند</a>
-                                        <a href="#" class="nav-link block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white" data-page="list-country" data-country="TR" data-country-name="تركيا">تركيا</a>
-                                        <a href="#" class="nav-link block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white" data-page="list-country" data-country="KR" data-country-name="كوريا">كوريا</a>
-                                        <a href="#" class="nav-link block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white" data-page="list-country" data-country="GB" data-country-name="بريطانيا">بريطانيا</a>
-                                        <a href="#" class="nav-link block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white" data-page="list-country" data-country="FR" data-country-name="فرنسا">فرنسا</a>
-                                        <a href="#" class="nav-link block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white" data-page="list-country" data-country="ES" data-country-name="إسبانيا">إسبانيا</a>
-                                        <a href="#" class="nav-link block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white" data-page="list-country" data-country="JP" data-country-name="اليابان">اليابان</a>
-                                        <a href="#" class="nav-link block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white" data-page="list-country" data-country="CN" data-country-name="الصين">الصين</a>
+                                        <a href="/list/country/US" class="nav-link block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white" data-country-name="الولايات المتحدة">الولايات المتحدة</a>
+                                        <a href="/list/country/EG" class="nav-link block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white" data-country-name="مصر">مصر</a>
+                                        <a href="/list/country/IN" class="nav-link block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white" data-country-name="الهند">الهند</a>
+                                        <a href="/list/country/TR" class="nav-link block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white" data-country-name="تركيا">تركيا</a>
+                                        <a href="/list/country/KR" class="nav-link block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white" data-country-name="كورية">كورية</a>
+                                        <a href="/list/country/GB" class="nav-link block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white" data-country-name="بريطانيا">بريطانيا</a>
+                                        <a href="/list/country/FR" class="nav-link block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white" data-country-name="فرنسا">فرنسا</a>
+                                        <a href="/list/country/ES" class="nav-link block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white" data-country-name="إسبانيا">إسبانيا</a>
+                                        <a href="/list/country/JP" class="nav-link block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white" data-country-name="اليابان">اليابان</a>
+                                        <a href="/list/country/CN" class="nav-link block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white" data-country-name="الصين">الصين</a>
                                     </div>
                                 </div>
                             </div>
@@ -170,11 +169,11 @@
             <!-- Mobile Menu -->
             <div id="mobile-menu" class="md:hidden hidden">
                 <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-                    <a href="#" class="nav-link text-gray-300 hover:text-red-500 block px-3 py-2 rounded-md text-base font-medium" data-page="home" data-lang-key="home">الرئيسية</a>
-                    <a href="#" class="nav-link text-gray-300 hover:text-red-500 block px-3 py-2 rounded-md text-base font-medium" data-page="movies" data-lang-key="movies">أفلام</a>
-                    <a href="#" class="nav-link text-gray-300 hover:text-red-500 block px-3 py-2 rounded-md text-base font-medium" data-page="series" data-lang-key="series">مسلسلات</a>
-                    <a href="#" class="nav-link text-gray-300 hover:text-red-500 block px-3 py-2 rounded-md text-base font-medium" data-page="anime" data-lang-key="anime">أنمي</a>
-                    <a href="#" class="nav-link text-gray-300 hover:text-red-500 block px-3 py-2 rounded-md text-base font-medium" data-page="countries" data-lang-key="countries">الدول</a>
+                    <a href="/" class="nav-link text-gray-300 hover:text-red-500 block px-3 py-2 rounded-md text-base font-medium" data-lang-key="home">الرئيسية</a>
+                    <a href="/list/movies" class="nav-link text-gray-300 hover:text-red-500 block px-3 py-2 rounded-md text-base font-medium" data-lang-key="movies">أفلام</a>
+                    <a href="/list/series" class="nav-link text-gray-300 hover:text-red-500 block px-3 py-2 rounded-md text-base font-medium" data-lang-key="series">مسلسلات</a>
+                    <a href="/list/anime" class="nav-link text-gray-300 hover:text-red-500 block px-3 py-2 rounded-md text-base font-medium" data-lang-key="anime">أنمي</a>
+                    <a href="/list/countries" class="nav-link text-gray-300 hover:text-red-500 block px-3 py-2 rounded-md text-base font-medium" data-lang-key="countries">الدول</a>
                 </div>
             </div>
         </header>

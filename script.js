@@ -43,13 +43,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // --- API HELPER FUNCTIONS ---
     const fetchFromTMDb = async (endpoint, params = {}) => {
-        const urlParams = new URLSearchParams({ ...params, language: 'ar-EG' });
+        const urlParams = new URLSearchParams({ api_key: apiKey, ...params, language: 'ar-EG' });
         const url = `${apiUrl}/${endpoint}?${urlParams}`;
         try {
             const response = await fetch(url, {
                 method: 'GET',
                 headers: {
-                    'Authorization': `Bearer ${accessToken}`,
                     'Content-Type': 'application/json;charset=utf-8'
                 }
             });

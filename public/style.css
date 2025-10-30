@@ -1,93 +1,70 @@
-/* Professional Dark Mode Theme using CSS Variables */
-
-/* 1. Define color variables for the default (light) theme */
-:root {
-    --color-background: #F0F2F5;
-    --color-background-secondary: #FFFFFF;
-    --color-text-primary: #050505;
-    --color-text-secondary: #65676B;
-    --color-border: #CED0D4;
-    --color-accent: #007bff;
-    --color-accent-hover: #0056b3;
-
-    /* Transition for smooth theme changes */
-    --theme-transition: color 0.3s ease, background-color 0.3s ease;
-}
-
-/* 2. Define overrides for the dark theme */
-[data-theme="dark"] {
-    --color-background: #121212;
-    --color-background-secondary: #1E1E1E;
-    --color-text-primary: #E4E6EB;
-    --color-text-secondary: #B0B3B8;
-    --color-border: #3A3B3C;
-    --color-accent: #0d8eff;
-    --color-accent-hover: #007bff;
-}
-
-/* 3. (Optional but Recommended) Automatically use dark mode if it's the user's OS preference */
-@media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) {
-        --color-background: #121212;
-        --color-background-secondary: #1E1E1E;
-        --color-text-primary: #E4E6EB;
-        --color-text-secondary: #B0B3B8;
-        --color-border: #3A3B3C;
-        --color-accent: #0d8eff;
-        --color-accent-hover: #007bff;
-    }
-}
-
-/* 4. Apply the variables to your elements */
 body {
-    background-color: var(--color-background);
-    color: var(--color-text-primary);
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-    margin: 0;
-    padding: 2rem;
-    transition: var(--theme-transition);
+            font-family: 'Cairo', sans-serif;
+            background-color: #111827; /* Dark Gray */
+            color: #d1d5db; /* Light Gray */
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1f2937;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #e50914; /* Red */
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #f5313d;
+        }
+        /* Active navigation link style */
+        .nav-link.active {
+            color: #e50914;
+            font-weight: 700;
+        }
+        /* Slider styles */
+        .slider-item {
+            display: none;
+            transition: opacity 0.5s ease-in-out;
+        }
+        .slider-item.active {
+            display: block;
+        }
+        /* Movie card overlay */
+        .card-overlay {
+            background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0) 100%);
+        }
+        /* Play button hover effect */
+        .play-icon-hover {
+            transition: transform 0.3s ease, background-color 0.3s ease;
+        }
+        .group:hover .play-icon-hover {
+            transform: scale(1.1);
+            background-color: rgba(229, 9, 20, 0.8);
+        }
+        /* Hidden pages styles */
+        .page {
+            display: none;
+        }
+        .page.active {
+            display: block;
+        }
+
+.player-container {
+    position: relative;
+    width: 100%;
+    padding-top: 56.25%; /* 16:9 Aspect Ratio */
+    background-color: #000;
+    border-radius: 0.5rem;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
 }
 
-.container {
-    background-color: var(--color-background-secondary);
-    border: 1px solid var(--color-border);
-    border-radius: 8px;
-    padding: 2rem;
-    max-width: 800px;
-    margin: auto;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    transition: var(--theme-transition);
-}
-
-h1 {
-    color: var(--color-text-primary);
-    border-bottom: 2px solid var(--color-accent);
-    padding-bottom: 0.5rem;
-}
-
-p {
-    color: var(--color-text-secondary);
-    line-height: 1.6;
-}
-
-/* Simple Theme Toggle Button */
-.theme-toggle {
-    cursor: pointer;
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    background-color: var(--color-background-secondary);
-    border: 1px solid var(--color-border);
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.2rem;
-    transition: var(--theme-transition), transform 0.2s ease;
-}
-
-.theme-toggle:hover {
-    transform: scale(1.1);
+.player-container iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 0.5rem;
 }
