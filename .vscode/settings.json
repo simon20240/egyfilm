@@ -1,10 +1,3 @@
 {
-    "liveServer.settings.port": 5501,
-    "liveServer.settings.root": "/egyfilm"
+    "liveServer.settings.port": 5502
 }
-git add
-git commit -m "feat: add ad banner"
-git push https://github.com/simon20240/egyfilm.git main
-
-git remote add origin https://github.com/simon20240/egyfilm.git
-git push -u origin main
