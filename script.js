@@ -297,13 +297,32 @@ document.addEventListener('DOMContentLoaded', function () {
                         <!-- Sub-server buttons will be injected here -->
                     </div>
                 </div>
-                
                 ${watchSectionHTML}
+                <div id="ad-container-placeholder"></div>
                 ${contentHTML}
             `;
         
         if (isSeries) {
             renderSeasons(item);
+        }
+
+        const adPlaceholder = document.getElementById('ad-container-placeholder');
+        if (adPlaceholder) {
+            const adContainer = document.createElement('div');
+            adContainer.className = 'my-4 flex justify-center';
+
+            const adScript = document.createElement('script');
+            adScript.async = true;
+            adScript.dataset.cfasync = 'false';
+            adScript.src = '//pl27957519.effectivegatecpm.com/9c1af3a3734eb1fc890dd0c8b1c7f27e/invoke.js';
+
+            const adDiv = document.createElement('div');
+            adDiv.id = 'container-9c1af3a3734eb1fc890dd0c8b1c7f27e';
+
+            adContainer.appendChild(adScript);
+            adContainer.appendChild(adDiv);
+
+            adPlaceholder.parentNode.replaceChild(adContainer, adPlaceholder);
         }
 
         const subServerButtonsContainer = document.getElementById('sub-server-buttons');
