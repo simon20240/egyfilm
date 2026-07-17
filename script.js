@@ -563,65 +563,81 @@ document.addEventListener('DOMContentLoaded', function () {
     };
 
     // --- NAVIGATION & PAGE MANAGEMENT ---
-    const navigateTo = async (pageName, data = {}) => {
-        window.scrollTo(0, 0);
-        
+    const navigateTo = (path, data = {}) => {
+        history.pushState({ path, data }, '', path);
+        router();
+    };
+
+    const router = async () => {
+        const path = window.location.pathname;
+        const parts = path.split('/').filter(p => p);
+        const page = parts[0] || 'home';
+        const id = parts[1];
+        const season = parts[2];
+        const episode = parts[3];
+
         Object.values(pages).forEach(p => p.classList.remove('active'));
         document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
 
+        let pageName = 'home';
         let targetPage = pages.home;
-        if (pageName.startsWith('list-') || pageName === 'anime' || pageName === 'countries') {
-            targetPage = pages.list;
-        } else if (pageName.startsWith('details')) {
+
+        if (page === 'movie' || page === 'tv') {
+            pageName = 'details';
             targetPage = pages.details;
-        } else if (pages[pageName]) {
-            targetPage = pages[pageName];
+        } else if (page.startsWith('list-')) {
+            pageName = page;
+            targetPage = pages.list;
+        } else if (pages[page]) {
+            pageName = page;
+            targetPage = pages[page];
         }
 
-        if(targetPage) {
+        if (targetPage) {
             targetPage.classList.add('active');
         }
 
-        document.querySelectorAll(`.nav-link[data-page="${data.nav_id || pageName}"]`).forEach(l => l.classList.add('active'));
+        document.querySelectorAll(`.nav-link[data-page="${page}"]`).forEach(l => l.classList.add('active'));
 
         state.currentPage = pageName;
 
-        switch(pageName) {
+        switch (pageName) {
             case 'home':
                 await renderHomePage();
                 break;
             case 'details':
-                state.currentItemId = data.id;
-                state.currentMediaType = data.mediaType;
-                await renderDetailsPage(data.id, data.mediaType);
+                const mediaType = page;
+                state.currentItemId = id;
+                state.currentMediaType = mediaType;
+                await renderDetailsPage(id, mediaType);
                 break;
             case 'details-anime':
-                await renderAnimeDetailsPage(data.animeId);
+                await renderAnimeDetailsPage(id);
                 break;
             case 'list-movies':
-                await renderListPage('كل الأفلام', (page) => fetchFromTMDb('discover/movie', { sort_by: 'popularity.desc', page: page }));
+                await renderListPage('كل الأفلام', (pageNum) => fetchFromTMDb('discover/movie', { sort_by: 'popularity.desc', page: pageNum }));
                 break;
             case 'list-series':
-                await renderListPage('كل المسلسلات', (page) => fetchFromTMDb('discover/tv', { sort_by: 'popularity.desc', page: page }));
+                await renderListPage('كل المسلسلات', (pageNum) => fetchFromTMDb('discover/tv', { sort_by: 'popularity.desc', page: pageNum }));
                 break;
             case 'anime':
             case 'list-anime':
                 await renderAnimePage('أنمي', 'top/anime', { type: 'ona', page: 1, limit: 100 });
                 break;
             case 'list-movies-country':
-                await renderListPage(`أفلام ${data.countryName}`, (page) => fetchFromTMDb('discover/movie', { with_origin_country: data.country, sort_by: 'popularity.desc', page: page }));
+                await renderListPage(`أفلام ${history.state.data.countryName}`, (pageNum) => fetchFromTMDb('discover/movie', { with_origin_country: history.state.data.country, sort_by: 'popularity.desc', page: pageNum }));
                 break;
             case 'list-series-country':
-                await renderListPage(`مسلسلات ${data.countryName}`, (page) => fetchFromTMDb('discover/tv', { with_origin_country: data.country, sort_by: 'popularity.desc', page: page }));
+                await renderListPage(`مسلسلات ${history.state.data.countryName}`, (pageNum) => fetchFromTMDb('discover/tv', { with_origin_country: history.state.data.country, sort_by: 'popularity.desc', page: pageNum }));
                 break;
             case 'list-country':
-                await renderListPage(`أفلام ومسلسلات ${data.countryName}`, async (page) => {
+                await renderListPage(`أفلام ومسلسلات ${history.state.data.countryName}`, async (pageNum) => {
                     const [movies, series] = await Promise.all([
-                        fetchFromTMDb('discover/movie', { with_origin_country: data.country, sort_by: 'popularity.desc', page: page }),
-                        fetchFromTMDb('discover/tv', { with_origin_country: data.country, sort_by: 'popularity.desc', page: page })
+                        fetchFromTMDb('discover/movie', { with_origin_country: history.state.data.country, sort_by: 'popularity.desc', page: pageNum }),
+                        fetchFromTMDb('discover/tv', { with_origin_country: history.state.data.country, sort_by: 'popularity.desc', page: pageNum })
                     ]);
                     const combined = [...(movies?.results || []), ...(series?.results || [])];
-                    const total_pages = movies.total_pages > series.total_pages ? movies.total_pages : series.total_pages;
+                    const total_pages = Math.max(movies.total_pages, series.total_pages);
                     return { results: combined.sort((a, b) => b.popularity - a.popularity), total_pages: total_pages };
                 });
                 break;
@@ -634,10 +650,10 @@ document.addEventListener('DOMContentLoaded', function () {
                  `).join('');
                 break;
             case 'list-genre':
-                await renderListPage(`فئة: ${data.genreName}`, (page) => fetchFromTMDb('discover/movie', { with_genres: data.genreId, page: page }));
+                await renderListPage(`فئة: ${history.state.data.genreName}`, (pageNum) => fetchFromTMDb('discover/movie', { with_genres: history.state.data.genreId, page: pageNum }));
                 break;
             case 'list-search':
-                await renderListPage(`نتائج البحث عن "${data.query}"`, (page) => fetchFromTMDb('search/multi', { query: data.query, page: page }));
+                await renderListPage(`نتائج البحث عن "${history.state.data.query}"`, (pageNum) => fetchFromTMDb('search/multi', { query: history.state.data.query, page: pageNum }));
                 break;
         }
     };
@@ -733,13 +749,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
         const animeCard = e.target.closest('[data-anime-id]');
         if (animeCard) {
-            navigateTo('details-anime', { animeId: animeCard.dataset.animeId });
+            e.preventDefault();
+            navigateTo(`/anime/${animeCard.dataset.animeId}`);
             return;
         }
 
         const card = e.target.closest('.group[data-id], .view-details-btn[data-id]');
         if (card) {
-            navigateTo('details', { id: card.dataset.id, mediaType: card.dataset.mediaType });
+            e.preventDefault();
+            navigateTo(`/${card.dataset.mediaType}/${card.dataset.id}`);
             return;
         }
 
@@ -747,24 +765,30 @@ document.addEventListener('DOMContentLoaded', function () {
         if (navLink) {
             e.preventDefault();
             const page = navLink.dataset.page;
+            
+            const pathMap = {
+                'home': '/',
+                'movies': '/list-movies',
+                'series': '/list-series',
+                'anime': '/list-anime',
+                'countries': '/list-countries',
+            };
+            
+            const path = pathMap[page] || `/${page}`;
+            
             const country = navLink.dataset.country;
             const countryName = navLink.dataset.countryName;
             const genreName = navLink.dataset.genreName;
 
-            const pageToGo = {
-                'home': 'home',
-                'movies': 'list-movies',
-                'series': 'list-series',
-            }[page] || page;
-
-            navigateTo(pageToGo, { nav_id: page, country, countryName, genreName });
+            navigateTo(path, { nav_id: page, country, countryName, genreName });
             document.getElementById('mobile-menu').classList.add('hidden');
             return;
         }
         
         const categoryCard = e.target.closest('.category-card[data-genre-id]');
         if (categoryCard) {
-            navigateTo('list-genre', { genreId: categoryCard.dataset.genreId, genreName: categoryCard.dataset.genreName });
+            e.preventDefault();
+            navigateTo(`/list-genre/${categoryCard.dataset.genreId}`, { genreId: categoryCard.dataset.genreId, genreName: categoryCard.dataset.genreName });
             return;
         }
 
@@ -813,7 +837,8 @@ document.addEventListener('DOMContentLoaded', function () {
     
     document.getElementById('search-input').addEventListener('keypress', (e) => {
         if (e.key === 'Enter' && e.target.value.trim() !== '') {
-            navigateTo('list-search', { query: e.target.value.trim() });
+            e.preventDefault();
+            navigateTo(`/list-search`, { query: e.target.value.trim() });
             e.target.blur();
         }
     });
@@ -823,7 +848,9 @@ document.addEventListener('DOMContentLoaded', function () {
         await fetchTranslations();
         updateUIText(currentLang);
         await fetchAndStoreGenres();
-        navigateTo('home');
+        
+        window.addEventListener('popstate', router);
+        router();
     };
 
     // --- ADMIN DASHBOARD LOGIC ---
