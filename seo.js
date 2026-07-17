@@ -7,22 +7,27 @@ const SEO = {
         const head = document.querySelector('head');
         if (!head) return;
 
-        // Clear existing SEO tags
         this.clearSeoTags(head);
 
-        let title, description, keywords, ogTitle, ogDescription, ogImage, ogType, ogSiteName;
+        let metadata = this.generateMetadata(page, data);
+        this.generateSeoTags(metadata);
+    },
 
-        ogSiteName = "EgyFilm";
-        ogType = "website";
-        ogImage = "https://egyfilm-three.vercel.app/public/logo.png"; // A default logo
+    generateMetadata: function(page, data) {
+        let title, description, keywords, canonical, og, twitter;
+
+        const siteTitle = "EgyFilm";
+        const siteDescription = "موقع EgyFilm لمشاهدة وتحميل أحدث الأفلام والمسلسلات العربية والأجنبية والهندية والتركية والأسيوية بجودة عالية.";
+        const defaultImage = `${window.location.origin}/public/logo.png`;
+        const twitterSite = "@EgyFilm";
+
+        canonical = window.location.href;
 
         switch(page) {
             case 'home':
-                title = "EgyFilm - مشاهدة الأفلام والمسلسلات";
-                description = "موقع EgyFilm لمشاهدة وتحميل أحدث الأفلام والمسلسلات العربية والأجنبية والهندية والتركية والأسيوية بجودة عالية.";
+                title = `${siteTitle} - مشاهدة الأفلام والمسلسلات`;
+                description = siteDescription;
                 keywords = "EgyFilm, أفلام, مسلسلات, مشاهدة, تحميل, مترجم, عربي, egybest";
-                ogTitle = title;
-                ogDescription = description;
                 break;
             case 'details':
                 const item = data.item;
@@ -31,33 +36,59 @@ const SEO = {
                 const englishTitle = item.original_title || item.original_name;
                 const year = (item.release_date || item.first_air_date || '').substring(0, 4);
 
-                title = `مشاهدة ${mediaType} ${arabicTitle} (${year}) مترجم - EgyFilm`;
-                description = item.overview ? item.overview.substring(0, 160) : `شاهد ${mediaType} ${arabicTitle} مترجم بجودة عالية على EgyFilm.`;
-                keywords = `${arabicTitle}, ${englishTitle}, ${year}, ${mediaType}, مشاهدة, مترجم, EgyFilm`;
-                ogTitle = title;
-                ogDescription = description;
-                ogImage = item.poster_path ? `https://image.tmdb.org/t/p/w500${item.poster_path}` : ogImage;
-                ogType = data.mediaType === 'tv' ? 'video.tv_show' : 'video.movie';
+                title = `مشاهدة ${mediaType} ${arabicTitle} (${year}) مترجم - ${siteTitle}`;
+                description = item.overview ? item.overview.substring(0, 160) : `شاهد ${mediaType} ${arabicTitle} مترجم بجودة عالية على ${siteTitle}.`;
+                keywords = `${arabicTitle}, ${englishTitle}, ${year}, ${mediaType}, مشاهدة, مترجم, ${siteTitle}`;
+                canonical = `${window.location.origin}/#details/${data.mediaType}/${item.id}`;
+                og = {
+                    type: data.mediaType === 'tv' ? 'video.tv_show' : 'video.movie',
+                    image: item.poster_path ? `https://image.tmdb.org/t/p/w500${item.poster_path}` : defaultImage,
+                };
                 break;
             default:
-                title = "EgyFilm - مشاهدة الأفلام والمسلسلات";
-                description = "موقع EgyFilm لمشاهدة وتحميل أحدث الأفلام والمسلسلات العربية والأجنبية والهندية والتركية والأسيوية بجودة عالية.";
+                title = `${siteTitle} - مشاهدة الأفلام والمسلسلات`;
+                description = siteDescription;
                 keywords = "EgyFilm, أفلام, مسلسلات, مشاهدة, تحميل, مترجم, عربي, egybest";
-                ogTitle = title;
-                ogDescription = description;
                 break;
         }
 
-        document.title = title;
-        this.createMetaTag('name', 'description', description);
-        this.createMetaTag('name', 'keywords', keywords);
-        this.createMetaTag('property', 'og:title', ogTitle);
-        this.createMetaTag('property', 'og:description', ogDescription);
-        this.createMetaTag('property', 'og:image', ogImage);
-        this.createMetaTag('property', 'og:type', ogType);
-        this.createMetaTag('property', 'og:site_name', ogSiteName);
+        og = {
+            title: title,
+            description: description,
+            image: (og && og.image) || defaultImage,
+            type: (og && og.type) || 'website',
+            site_name: siteTitle,
+            url: canonical
+        };
+
+        twitter = {
+            title: title,
+            description: description,
+            image: (og && og.image) || defaultImage
+        };
+
+        return { title, description, keywords, canonical, og, twitter };
+    },
+
+    generateSeoTags: function(metadata) {
+        document.title = metadata.title;
+        this.createMetaTag('name', 'description', metadata.description);
+        this.createMetaTag('name', 'keywords', metadata.keywords);
+        this.createLinkTag('canonical', metadata.canonical);
+        this.createMetaTag('property', 'og:title', metadata.og.title);
+        this.createMetaTag('property', 'og:description', metadata.og.description);
+        this.createMetaTag('property', 'og:image', metadata.og.image);
+        this.createMetaTag('property', 'og:url', metadata.og.url);
+        this.createMetaTag('property', 'og:type', metadata.og.type);
+        this.createMetaTag('property', 'og:site_name', metadata.og.site_name);
+        this.createMetaTag('name', 'twitter:card', 'summary_large_image');
+        this.createMetaTag('name', 'twitter:site', '@EgyFilm');
+        this.createMetaTag('name', 'twitter:title', metadata.twitter.title);
+        this.createMetaTag('name', 'twitter:description', metadata.twitter.description);
+        this.createMetaTag('name', 'twitter:image', metadata.twitter.image);
         this.createMetaTag('name', 'robots', 'index, follow');
     },
+		
 
     injectStructuredData: function(page, data) {
         const head = document.querySelector('head');
@@ -76,12 +107,12 @@ const SEO = {
                 schema = {
                     "@context": "https://schema.org",
                     "@type": "WebSite",
-                    "url": "https://egyfilm-three.vercel.app/",
+                    "url": "window.location.origin",
                     "name": "EgyFilm",
                     "description": "موقع EgyFilm لمشاهدة وتحميل أحدث الأفلام والمسلسلات العربية والأجنبية والهندية والتركية والأسيوية بجودة عالية.",
                     "potentialAction": {
                         "@type": "SearchAction",
-                        "target": "https://egyfilm-three.vercel.app/#search/{search_term_string}",
+                        "target": "window.location.origin#search/{search_term_string}",
                         "query-input": "required name=search_term_string"
                     }
                 };
@@ -89,7 +120,7 @@ const SEO = {
             case 'details':
                 const item = data.item;
                 const mediaType = data.mediaType;
-                const url = `https://egyfilm-three.vercel.app/#details/${mediaType}/${item.id}`;
+                const url = `window.location.origin#details/${mediaType}/${item.id}`;
 
                 if (mediaType === 'movie') {
                     schema = {
@@ -132,6 +163,16 @@ const SEO = {
             schemaScript.textContent = JSON.stringify(schema);
             head.appendChild(schemaScript);
         }
+    },
+
+    createLinkTag: function(rel, href) {
+        const head = document.querySelector('head');
+        if (!head) return;
+
+        const link = document.createElement('link');
+        link.setAttribute('rel', rel);
+        link.setAttribute('href', href);
+        head.appendChild(link);
     },
 
     createMetaTag: function(attr, name, content) {
